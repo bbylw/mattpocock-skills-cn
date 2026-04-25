@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent 技能包 — 扩展你的 AI 开发能力</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0e0e11;
+  --bg-card: #16161a;
+  --bg-card-hover: #1c1c22;
+  --surface: #222228;
+  --border: #2a2a32;
+  --border-hover: #3a3a45;
+  --text: #e8e6e1;
+  --text-muted: #8a8a95;
+  --text-dim: #5a5a65;
+  --accent-orange: #d97757;
+  --accent-blue: #6a9bcc;
+  --accent-green: #788c5d;
+  --accent-purple: #9b7dbd;
+  --gradient-warm: linear-gradient(135deg, #d97757 0%, #c4613f 100%);
+  --gradient-cool: linear-gradient(135deg, #6a9bcc 0%, #5580aa 100%);
+  --gradient-earth: linear-gradient(135deg, #788c5d 0%, #5f7248 100%);
+  --gradient-violet: linear-gradient(135deg, #9b7dbd 0%, #7d5fa5 100%);
+  --radius: 1.25rem;
+  --radius-sm: 0.75rem;
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Sans SC', 'Space Grotesk', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+.container {
+  max-w: 1400px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 clamp(1rem, 4vw, 3rem);
+}
+
+/* ===== HERO ===== */
+.hero {
+  padding: clamp(4rem, 12vh, 8rem) 0 clamp(3rem, 8vh, 6rem);
+  position: relative;
+}
+
+.hero::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(217, 119, 87, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 2rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 2rem;
+  animation: fadeUp 0.8s var(--ease) both;
+}
+
+.hero-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-green);
+  animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.hero h1 {
+  font-family: 'Space Grotesk', 'Noto Sans SC', sans-serif;
+  font-size: clamp(2.8rem, 7vw, 5.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  max-width: 900px;
+  animation: fadeUp 0.8s var(--ease) 0.1s both;
+}
+
+.hero h1 .highlight {
+  background: var(--gradient-warm);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-desc {
+  font-size: clamp(1rem, 2vw, 1.25rem);
+  color: var(--text-muted);
+  max-width: 580px;
+  line-height: 1.7;
+  margin-top: 1.5rem;
+  font-weight: 300;
+  animation: fadeUp 0.8s var(--ease) 0.2s both;
+}
+
+/* ===== NAV PILLS ===== */
+.category-nav {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 3rem;
+  animation: fadeUp 0.8s var(--ease) 0.3s both;
+}
+
+.nav-pill {
+  padding: 0.6rem 1.2rem;
+  border-radius: 2rem;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s var(--ease);
+  font-family: inherit;
+}
+
+.nav-pill:hover, .nav-pill.active {
+  background: var(--surface);
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+.nav-pill.active {
+  background: var(--accent-orange);
+  border-color: var(--accent-orange);
+  color: #fff;
+}
+
+/* ===== SECTIONS ===== */
+.section {
+  margin-bottom: 5rem;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.section-icon.planning { background: var(--gradient-warm); }
+.section-icon.dev { background: var(--gradient-cool); }
+.section-icon.toolchain { background: var(--gradient-earth); }
+.section-icon.writing { background: var(--gradient-violet); }
+
+.section-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.section-subtitle {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  font-weight: 300;
+}
+
+/* ===== SKILL CARDS ===== */
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1rem;
+}
+
+.skill-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  transition: all 0.4s var(--ease);
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+}
+
+.skill-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease);
+}
+
+.skill-card.planning-card::before { background: var(--gradient-warm); }
+.skill-card.dev-card::before { background: var(--gradient-cool); }
+.skill-card.toolchain-card::before { background: var(--gradient-earth); }
+.skill-card.writing-card::before { background: var(--gradient-violet); }
+
+.skill-card:hover {
+  background: var(--bg-card-hover);
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+}
+
+.skill-card:hover::before {
+  opacity: 1;
+}
+
+.skill-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.skill-tag {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.tag-planning { background: rgba(217, 119, 87, 0.15); color: var(--accent-orange); }
+.tag-dev { background: rgba(106, 155, 204, 0.15); color: var(--accent-blue); }
+.tag-toolchain { background: rgba(120, 140, 93, 0.15); color: var(--accent-green); }
+.tag-writing { background: rgba(155, 125, 189, 0.15); color: var(--accent-purple); }
+
+.skill-desc {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 1.2rem;
+  font-weight: 300;
+}
+
+.skill-install {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 1rem;
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  transition: border-color 0.3s var(--ease);
+  position: relative;
+  overflow: hidden;
+}
+
+.skill-install:hover {
+  border-color: var(--border-hover);
+}
+
+.skill-install code {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-muted);
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-btn:hover {
+  color: var(--text);
+  background: rgba(255,255,255,0.05);
+}
+
+.copy-btn.copied {
+  color: var(--accent-green);
+}
+
+/* ===== FOOTER ===== */
+footer {
+  border-top: 1px solid var(--border);
+  padding: 3rem 0;
+  margin-top: 4rem;
+}
+
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.footer-text {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+}
+
+.footer-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+
+.footer-link:hover {
+  color: var(--accent-orange);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: all 0.7s var(--ease);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 8vw, 3rem);
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span class="dot"></span>
+      开源技能集合
+    </div>
+    <h1>构建更好的 AI<br><span class="highlight">工作流技能包</span></h1>
+    <p class="hero-desc">一组扩展规划、开发与工具链能力的 Agent 技能集合。从需求分析到代码交付，用技能驱动每一步。</p>
+  </section>
+
+  <!-- CATEGORY NAV -->
+  <nav class="category-nav">
+    <button class="nav-pill active" data-filter="all">全部技能</button>
+    <button class="nav-pill" data-filter="planning">规划与设计</button>
+    <button class="nav-pill" data-filter="dev">开发</button>
+    <button class="nav-pill" data-filter="toolchain">工具链</button>
+    <button class="nav-pill" data-filter="writing">写作与知识</button>
+  </nav>
+
+  <!-- PLANNING -->
+  <section class="section reveal" data-category="planning">
+    <div class="section-header">
+      <div class="section-icon planning">📐</div>
+      <div>
+        <div class="section-title">规划与设计</div>
+        <div class="section-subtitle">在编写代码之前理清思路</div>
+      </div>
+    </div>
+    <div class="skills-grid">
+
+      <div class="skill-card planning-card">
+        <div class="skill-name">to-prd <span class="skill-tag tag-planning">PRD</span></div>
+        <div class="skill-desc">将当前对话上下文转化为 PRD（产品需求文档），并提交为 GitHub Issue。无需访谈——直接综合你已讨论过的内容。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/to-prd</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="skill-card planning-card">
+        <div class="skill-name">to-issues <span class="skill-tag tag-planning">拆分</span></div>
+        <div class="skill-desc">使用垂直切片方式，将任何计划、规格说明或 PRD 拆分为可独立认领的 GitHub Issue。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/to-issues</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="skill-card planning-card">
+        <div class="skill-name">grill-me <span class="skill-tag tag-planning">访谈</span></div>
+        <div class="skill-desc">就某个计划或设计进行持续追问式访谈，直到决策树上的每一个分支都得到解决。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/grill-me</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="skill-card planning-card">
+        <div class="skill-name">design-an-interface <span class="skill-tag tag-planning">接口</span></div>
+        <div class="skill-desc">使用并行子 Agent 为某个模块生成多个截然不同的接口设计方案。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/design-an-interface</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="skill-card planning-card">
+        <div class="skill-name">request-refactor-plan <span class="skill-tag tag-planning">重构</span></div>
+        <div class="skill-desc">通过用户访谈创建带有细小提交的详细重构计划，并提交为 GitHub Issue。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/request-refactor-plan</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- DEV -->
+  <section class="section reveal" data-category="dev">
+    <div class="section-header">
+      <div class="section-icon dev">⚙️</div>
+      <div>
+        <div class="section-title">开发</div>
+        <div class="section-subtitle">编写、重构和修复代码</div>
+      </div>
+    </div>
+    <div class="skills-grid">
+
+      <div class="skill-card dev-card">
+        <div class="skill-name">tdd <span class="skill-tag tag-dev">测试</span></div>
+        <div class="skill-desc">遵循红-绿-重构循环的测试驱动开发。每次一个垂直切片地构建功能或修复缺陷。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/tdd</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="skill-card dev-card">
+        <div class="skill-name">triage-issue <span class="skill-tag tag-dev">排查</span></div>
+        <div class="skill-desc">通过探索代码库排查缺陷，定位根因，并提交附带 TDD 修复方案的 GitHub Issue。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/triage-issue</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="skill-card dev-card">
+        <div class="skill-name">improve-codebase-architecture <span class="skill-tag tag-dev">架构</span></div>
+        <div class="skill-desc">依据 CONTEXT.md 中的领域语言以及 docs/adr/ 中的决策记录，在代码库中发现可深化改进的机会。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/improve-codebase-architecture</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="skill-card dev-card">
+        <div class="skill-name">migrate-to-shoehorn <span class="skill-tag tag-dev">迁移</span></div>
+        <div class="skill-desc">将测试文件中的 as 类型断言迁移为 @total-typescript/shoehorn。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/migrate-to-shoehorn</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="skill-card dev-card">
+        <div class="skill-name">scaffold-exercises <span class="skill-tag tag-dev">练习</span></div>
+        <div class="skill-desc">创建包含章节、习题、解答和讲解的练习目录结构。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/scaffold-exercises</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TOOLCHAIN -->
+  <section class="section reveal" data-category="toolchain">
+    <div class="section-header">
+      <div class="section-icon toolchain">🔧</div>
+      <div>
+        <div class="section-title">工具链与环境配置</div>
+        <div class="section-subtitle">自动化你的开发环境</div>
+      </div>
+    </div>
+    <div class="skills-grid">
+
+      <div class="skill-card toolchain-card">
+        <div class="skill-name">setup-pre-commit <span class="skill-tag tag-toolchain">钩子</span></div>
+        <div class="skill-desc">配置 Husky pre-commit 钩子，集成 lint-staged、Prettier、类型检查和测试。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/setup-pre-commit</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="skill-card toolchain-card">
+        <div class="skill-name">git-guardrails <span class="skill-tag tag-toolchain">安全</span></div>
+        <div class="skill-desc">设置 Claude Code 钩子，在执行危险 git 命令（push、reset --hard、clean 等）前进行拦截。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/git-guardrails-claude-code</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- WRITING -->
+  <section class="section reveal" data-category="writing">
+    <div class="section-header">
+      <div class="section-icon writing">✍️</div>
+      <div>
+        <div class="section-title">写作与知识管理</div>
+        <div class="section-subtitle">沉淀知识、打磨内容</div>
+      </div>
+    </div>
+    <div class="skills-grid">
+
+      <div class="skill-card writing-card">
+        <div class="skill-name">write-a-skill <span class="skill-tag tag-writing">创作</span></div>
+        <div class="skill-desc">按照合理的结构、渐进式展开和资源打包的方式创建新技能。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/write-a-skill</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="skill-card writing-card">
+        <div class="skill-name">edit-article <span class="skill-tag tag-writing">编辑</span></div>
+        <div class="skill-desc">通过重组章节、提升清晰度和精简行文来编辑和改进文章。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/edit-article</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012-2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="skill-card writing-card">
+        <div class="skill-name">ubiquitous-language <span class="skill-tag tag-writing">DDD</span></div>
+        <div class="skill-desc">从当前对话中提取 DDD 风格的通用语言词汇表。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/ubiquitous-language</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="skill-card writing-card">
+        <div class="skill-name">obsidian-vault <span class="skill-tag tag-writing">笔记</span></div>
+        <div class="skill-desc">在 Obsidian 知识库中搜索、创建和管理带有双向链接与索引的笔记。</div>
+        <div class="skill-install">
+          <code>npx skills@latest add mattpocock/skills/obsidian-vault</code>
+          <button class="copy-btn" title="复制命令" onclick="copyCmd(this)">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <span class="footer-text">Agent 技能包 · 用技能驱动 AI 开发工作流</span>
+      <a class="footer-link" href="https://github.com/mattpocock/skills" target="_blank" rel="noopener">GitHub →</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Copy command
+function copyCmd(btn) {
+  const code = btn.parentElement.querySelector('code').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>';
+    }, 1500);
+  });
+}
+
+// Category filter
+const pills = document.querySelectorAll('.nav-pill');
+const sections = document.querySelectorAll('.section');
+
+pills.forEach(pill => {
+  pill.addEventListener('click', () => {
+    pills.forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    const filter = pill.dataset.filter;
+
+    sections.forEach(sec => {
+      if (filter === 'all' || sec.dataset.category === filter) {
+        sec.style.display = '';
+        requestAnimationFrame(() => sec.classList.add('visible'));
+      } else {
+        sec.style.display = 'none';
+        sec.classList.remove('visible');
+      }
+    });
+  });
+});
+
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
