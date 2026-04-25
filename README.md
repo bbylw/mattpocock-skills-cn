@@ -109,3 +109,7 @@
   ```
   npx skills@latest add mattpocock/skills/obsidian-vault
   ```
+
+---
+
+> 汉化自 [https://github.com/mattpocock/skills](https://github.com/mattpocock/skills)
