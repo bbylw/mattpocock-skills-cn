@@ -69,9 +69,9 @@
 
     screenEl.innerHTML = `
       <div class="term-prompt-line">
-        <span class="term-prompt-arrow">❯</span>
+        <span class="term-prompt-arrow">$</span>
         <span id="term-cmd-text" class="term-cmd-text"></span>
-        <span class="term-cursor">▍</span>
+        <span class="term-cursor">█</span>
       </div>
       <div id="term-logs-container"></div>
     `;

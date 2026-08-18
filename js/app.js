@@ -1,705 +1,587 @@
-// Application Controller - Modern Clean Studio (Polished & Refined)
-// Flag JS availability before first paint so reveal styles never cause a flash
-// of hidden content (FOUC).
-document.documentElement.classList.add('js');
+/* ================================================================
+   Terminal Brutalism × Editorial — App Logic
+   ================================================================ */
+(function () {
+  'use strict';
 
-document.addEventListener('DOMContentLoaded', () => {
-  const skills = window.SKILLS_DATA || [];
-  let activeFilter = 'all';
-  let searchQuery = '';
-  let activeView = 'grid'; // 'grid' | 'table'
+  const SKILLS = window.SKILLS_DATA || [];
 
-  // DOM Elements
-  const gridEl = document.getElementById('skills-grid');
-  const tableContainerEl = document.getElementById('skills-table-wrap');
-  const countEl = document.getElementById('skills-count');
-  const searchInput = document.getElementById('skills-search');
-  const filterBtns = document.querySelectorAll('.filter-btn');
-  const viewSwitchBtns = document.querySelectorAll('.view-switch-btn');
-  const modalOverlay = document.getElementById('skill-modal');
-  const modalCloseBtn = document.getElementById('modal-close');
-  const toastContainer = document.getElementById('toast-container');
-  const headerEl = document.querySelector('.site-header');
-  let lastFocusedEl = null;
-
-  // 0. Theme Toggle (dark / light), persisted to localStorage
-  const themeToggle = document.getElementById('theme-toggle');
-  const storedTheme = localStorage.getItem('theme');
-  const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-  function applyTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    if (themeToggle) {
-      const label = theme === 'dark' ? '切换到浅色模式' : '切换到深色模式';
-      themeToggle.setAttribute('aria-label', label);
-      themeToggle.title = label;
-    }
+  /* ── Utilities ── */
+  function escapeHTML(str) {
+    if (typeof str !== 'string') return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  applyTheme(storedTheme === 'light' || storedTheme === 'dark' ? storedTheme : (systemDark ? 'dark' : 'light'));
-
-  if (themeToggle) {
-    themeToggle.addEventListener('click', () => {
-      const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('theme', next);
-      applyTheme(next);
-    });
-  }
-
-  // Follow system theme changes while the user has no explicit preference
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-    if (!localStorage.getItem('theme')) applyTheme(e.matches ? 'dark' : 'light');
-  });
-
-  // 0b. Mobile Navigation
-  const navToggle = document.getElementById('nav-toggle');
-  const mobileMenu = document.getElementById('mobile-menu');
-
-  function setMobileMenu(open) {
-    if (!navToggle || !mobileMenu) return;
-    mobileMenu.classList.toggle('open', open);
-    navToggle.classList.toggle('open', open);
-    navToggle.setAttribute('aria-expanded', String(open));
-    navToggle.setAttribute('aria-label', open ? '关闭导航菜单' : '打开导航菜单');
-  }
-
-  if (navToggle && mobileMenu) {
-    navToggle.addEventListener('click', () => setMobileMenu(!mobileMenu.classList.contains('open')));
-
-    mobileMenu.querySelectorAll('.mobile-nav-link').forEach(link => {
-      link.addEventListener('click', () => setMobileMenu(false));
-    });
-
-    // Close when clicking outside the menu
-    document.addEventListener('click', (e) => {
-      if (mobileMenu.classList.contains('open') &&
-          !mobileMenu.contains(e.target) &&
-          !navToggle.contains(e.target)) {
-        setMobileMenu(false);
-      }
-    });
-
-    // Close on Escape
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && mobileMenu.classList.contains('open')) {
-        setMobileMenu(false);
-        navToggle.focus();
-      }
-    });
-  }
-
-  // 0c. Scroll Reveal (fade-up entrance for .reveal elements)
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('revealed');
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.12, rootMargin: '0px 0px -48px 0px' });
-
-  function observeReveals(scope) {
-    (scope || document).querySelectorAll('.reveal:not(.revealed)').forEach(el => revealObserver.observe(el));
-  }
-
-  observeReveals();
-
-  // 1. Header Scroll Shadow & ScrollSpy (throttled with requestAnimationFrame)
-  let scrollTicking = false;
-
-  function onScroll() {
-    if (scrollTicking) return;
-    scrollTicking = true;
-    requestAnimationFrame(() => {
-      const scrollY = window.scrollY;
-
-      if (scrollY > 20) {
-        headerEl.classList.add('scrolled');
-      } else {
-        headerEl.classList.remove('scrolled');
-      }
-
-      // ScrollSpy
-      let current = '';
-      const scrollPos = scrollY + 120;
-
-      sections.forEach(section => {
-        const top = section.offsetTop;
-        const height = section.offsetHeight;
-        if (scrollPos >= top && scrollPos < top + height) {
-          current = section.getAttribute('id');
-        }
-      });
-
-      navLinks.forEach(link => {
-        link.classList.remove('active');
-        if (link.getAttribute('href') === `#${current}`) {
-          link.classList.add('active');
-        }
-      });
-
-      scrollTicking = false;
-    });
-  }
-
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.nav-link');
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-
-  // 2. CONTEXT.md Interactive Comparison Scenarios
-  const SCENARIOS = {
-    'video': {
-      title: '案例对比：来自真实项目 course-video-manager 的 CONTEXT.md 落地效果',
-      before: '"当课程里某个章节中的一课被\'实体化\'（即被赋予了文件系统中的某个位置）时，会出问题。"',
-      after: '"实体化级联（materialization cascade）出问题了。"',
-      savings: '80%',
-      beforeNote: '⚠️ 痛点：Agent 需要阅读长篇解释，在长会话中极易发生概念漂移和逻辑理解偏差。',
-      afterNote: '✅ 收益：变量与架构命名保持一致，Agent 导航代码库更精准，思考消耗更少 Token。'
-    },
-    'triage': {
-      title: '案例对比：来自工单自动分类分派系统 (Issue Triage Engine)',
-      before: '"当用户在第三方系统修改了工单优先级，需要把它从待处理队列移出并放入高优重试通道，同时触发状态机重置。"',
-      after: '"触发 PriorityEscalation 事件并执行通道重路由。"',
-      savings: '85%',
-      beforeNote: '⚠️ 痛点：口语化描述容易让 Agent 遗漏幂等性检查和边缘状态回退处理。',
-      afterNote: '✅ 收益：统一状态机事件名后，生成的单元测试与状态迁移代码 100% 吻合。'
-    },
-    'deepening': {
-      title: '案例对比：来自计费中台架构重构 (Billing Engine Deepening)',
-      before: '"不要在外部自己调用算税助手、优惠券计算器和分账工具，统统通过核心计费接口一次性完成扣款与对账。"',
-      after: '"收敛浅模块至深模块 BillingEngine.processSettlement()。"',
-      savings: '75%',
-      beforeNote: '⚠️ 痛点：碎片化指令会让 Agent 频繁生成浅包装 Wrapper，加剧代码熵增。',
-      afterNote: '✅ 收益：Agent 严格遵循高内聚原则，将复杂性藏在深接口后。'
-    }
-  };
-
-  const diffTabs = document.querySelectorAll('.diff-tab-btn');
-  diffTabs.forEach(btn => {
-    btn.addEventListener('click', () => {
-      diffTabs.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      const data = SCENARIOS[btn.dataset.scenario];
-      if (!data) return;
-
-      const titleEl = document.getElementById('diff-scenario-title');
-      const beforeEl = document.getElementById('diff-before-text');
-      const afterEl = document.getElementById('diff-after-text');
-      const beforeNoteEl = document.getElementById('diff-before-note');
-      const afterNoteEl = document.getElementById('diff-after-note');
-      const savingsBadgeEl = document.getElementById('diff-savings-badge');
-      const gaugeFillEl = document.getElementById('diff-gauge-fill');
-      const gaugeTextEl = document.getElementById('diff-gauge-text');
-
-      if (titleEl) titleEl.textContent = data.title;
-      if (beforeEl) beforeEl.textContent = data.before;
-      if (afterEl) afterEl.textContent = data.after;
-      if (beforeNoteEl) beforeNoteEl.textContent = data.beforeNote;
-      if (afterNoteEl) afterNoteEl.textContent = data.afterNote;
-      if (savingsBadgeEl) savingsBadgeEl.textContent = `Token 节省 ${data.savings} · 消除歧义`;
-      if (gaugeFillEl) gaugeFillEl.style.width = data.savings;
-      if (gaugeTextEl) gaugeTextEl.textContent = `Token 消耗减少 ${data.savings}`;
-    });
-  });
-
-  // 3. Render Skills Grid & Table
-  function getFilteredSkills() {
-    return skills.filter(item => {
-      if (activeFilter === 'engineering' && item.category !== 'engineering') return false;
-      if (activeFilter === 'productivity' && item.category !== 'productivity') return false;
-      if (activeFilter === 'user' && item.type !== 'user') return false;
-      if (activeFilter === 'model' && item.type !== 'model') return false;
-
-      if (searchQuery.trim() !== '') {
-        const q = searchQuery.toLowerCase();
-        const inName = item.name.toLowerCase().includes(q);
-        const inDesc = item.desc.toLowerCase().includes(q);
-        const inLong = item.longDesc.toLowerCase().includes(q);
-        const inTags = item.tags.some(t => t.toLowerCase().includes(q));
-        if (!inName && !inDesc && !inLong && !inTags) return false;
-      }
-      return true;
-    });
-  }
-
-  function renderSkills() {
-    const filtered = getFilteredSkills();
-
-    if (countEl) {
-      countEl.textContent = `共展示 ${filtered.length} 个技能 (总计 ${skills.length} 个)`;
-    }
-
-    if (activeView === 'grid') {
-      if (gridEl) gridEl.style.display = 'grid';
-      if (tableContainerEl) tableContainerEl.style.display = 'none';
-      renderGridView(filtered);
-    } else {
-      if (gridEl) gridEl.style.display = 'none';
-      if (tableContainerEl) tableContainerEl.style.display = 'block';
-      renderTableView(filtered);
-    }
-  }
-
-  function renderGridView(filtered) {
-    if (!gridEl) return;
-
-    if (filtered.length === 0) {
-      gridEl.innerHTML = `
-        <div class="skills-empty-state">
-          <p class="skills-empty-text">未找到与「${searchQuery}」相关的技能</p>
-          <button class="btn btn-secondary" id="reset-filter-btn">清空搜索与筛选</button>
-        </div>
-      `;
-      const resetBtn = document.getElementById('reset-filter-btn');
-      if (resetBtn) {
-        resetBtn.addEventListener('click', resetSearch);
-      }
-      return;
-    }
-
-    gridEl.innerHTML = filtered.map(item => {
-      const isUser = item.type === 'user';
-      const typeBadge = isUser ? 'badge-blue' : 'badge-purple';
-      const typeLabel = isUser ? '用户调用 (编排)' : '模型调用 (纪律)';
-      const catBadge = item.category === 'engineering' ? 'badge-emerald' : 'badge-amber';
-      const catLabel = item.category === 'engineering' ? '工程实践' : '效率工具';
-
-      return `
-        <article class="clean-card skill-box-card" data-id="${item.id}" tabindex="0" role="button" aria-label="查看 ${item.name} 技能详情">
-          <div class="skill-box-top">
-            <span class="skill-box-name">/${item.name}</span>
-            <div class="skill-box-badges">
-              <span class="badge ${catBadge}">${catLabel}</span>
-              <span class="badge ${typeBadge}">${typeLabel}</span>
-            </div>
-          </div>
-          <p class="skill-box-desc">${item.desc}</p>
-          <div class="skill-box-tags">
-            ${item.tags.map(t => `<span class="kbd">#${t}</span>`).join('')}
-          </div>
-          <div class="skill-box-foot">
-            <button class="btn-skill-action copy-cmd-btn" data-cmd="${item.exampleCmd}" type="button">
-              复制指令
-            </button>
-            <button class="btn-skill-action view-detail-btn" data-id="${item.id}" type="button">
-              机制解析 ↗
-            </button>
-          </div>
-        </article>
-      `;
-    }).join('');
-
-    bindCardActions(gridEl);
-  }
-
-  function renderTableView(filtered) {
-    if (!tableContainerEl) return;
-
-    if (filtered.length === 0) {
-      tableContainerEl.innerHTML = `
-        <div class="skills-empty-state">
-          <p class="skills-empty-text">未找到与「${searchQuery}」相关的技能</p>
-        </div>
-      `;
-      return;
-    }
-
-    tableContainerEl.innerHTML = `
-      <table class="skills-dense-table">
-        <thead>
-          <tr>
-            <th>技能名称</th>
-            <th>分类</th>
-            <th>调用方式</th>
-            <th>核心用途</th>
-            <th style="text-align: right;">操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${filtered.map(item => {
-            const isUser = item.type === 'user';
-            const typeBadge = isUser ? 'badge-blue' : 'badge-purple';
-            const typeLabel = isUser ? '用户调用' : '模型调用';
-            const catBadge = item.category === 'engineering' ? 'badge-emerald' : 'badge-amber';
-            const catLabel = item.category === 'engineering' ? '工程' : '效率';
-
-            return `
-              <tr data-id="${item.id}" style="cursor: pointer;" tabindex="0">
-                <td><strong class="skill-table-name">/${item.name}</strong></td>
-                <td><span class="badge ${catBadge}">${catLabel}</span></td>
-                <td><span class="badge ${typeBadge}">${typeLabel}</span></td>
-                <td class="skill-table-desc">${item.desc}</td>
-                <td style="text-align: right; white-space: nowrap;">
-                  <button class="btn-skill-action copy-cmd-btn" data-cmd="${item.exampleCmd}" type="button" style="margin-right: 0.4rem;">
-                    复制
-                  </button>
-                  <button class="btn-skill-action view-detail-btn" data-id="${item.id}" type="button">
-                    详情 ↗
-                  </button>
-                </td>
-              </tr>
-            `;
-          }).join('')}
-        </tbody>
-      </table>
-    `;
-
-    bindCardActions(tableContainerEl);
-  }
-
-  function bindCardActions(container) {
-    container.querySelectorAll('.copy-cmd-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        copyText(btn.dataset.cmd, `已复制: ${btn.dataset.cmd}`);
-      });
-    });
-
-    container.querySelectorAll('.view-detail-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        openModal(btn.dataset.id);
-      });
-    });
-
-    container.querySelectorAll('.skill-box-card, tbody tr').forEach(row => {
-      row.addEventListener('click', () => {
-        openModal(row.dataset.id);
-      });
-      // Keyboard activation for card / row
-      row.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          openModal(row.dataset.id);
-        }
-      });
-    });
-  }
-
-  function resetSearch() {
-    activeFilter = 'all';
-    searchQuery = '';
-    if (searchInput) searchInput.value = '';
-    filterBtns.forEach(b => b.classList.toggle('active', b.dataset.filter === 'all'));
-    renderSkills();
-  }
-
-  // 4. Filter Buttons & View Switcher
-  filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filterBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeFilter = btn.dataset.filter;
-      renderSkills();
-    });
-  });
-
-  viewSwitchBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      viewSwitchBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      activeView = btn.dataset.view;
-      renderSkills();
-    });
-  });
-
-  // 5. Search input & Keyboard Shortcut [/]
-  let searchDebounce = null;
-  if (searchInput) {
-    searchInput.addEventListener('input', (e) => {
-      clearTimeout(searchDebounce);
-      searchDebounce = setTimeout(() => {
-        searchQuery = e.target.value;
-        renderSkills();
-      }, 120);
-    });
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === '/' && document.activeElement !== searchInput && !e.target.matches('input, textarea, [contenteditable]')) {
-        e.preventDefault();
-        searchInput.focus();
-        searchInput.select();
-        const matrixEl = document.getElementById('skills-matrix');
-        if (matrixEl) matrixEl.scrollIntoView({ behavior: 'smooth' });
-      } else if (e.key === 'Escape') {
-        if (modalOverlay && modalOverlay.classList.contains('open')) {
-          closeModal();
-        } else if (document.activeElement === searchInput) {
-          searchInput.value = '';
-          searchQuery = '';
-          searchInput.blur();
-          renderSkills();
-        }
-      }
-    });
-  }
-
-  // 6. Quick Jump Command Pills
-  document.querySelectorAll('.cmd-pill').forEach(pill => {
-    pill.addEventListener('click', () => {
-      const skillName = pill.dataset.skill;
-      if (!skillName) return;
-
-      const matrixEl = document.getElementById('skills-matrix');
-      if (matrixEl) {
-        matrixEl.scrollIntoView({ behavior: 'smooth' });
-        setTimeout(() => openModal(skillName), 400);
-      }
-    });
-  });
-
-  document.querySelectorAll('.solution-chip').forEach(chip => {
-    chip.addEventListener('click', () => {
-      const skillName = chip.dataset.skill;
-      if (skillName) openModal(skillName);
-    });
-  });
-
-  // 7. Interactive Setup Steps (click & keyboard)
-  document.querySelectorAll('.setup-step-box').forEach(box => {
-    function toggleStep() {
-      box.classList.toggle('completed');
-      const numEl = box.querySelector('.setup-step-number');
-      const isDone = box.classList.contains('completed');
-      box.setAttribute('aria-pressed', String(isDone));
-      if (isDone) {
-        if (numEl) numEl.innerHTML = '✓ COMPLETED';
-        box.style.borderColor = 'var(--accent-emerald-border)';
-        box.style.background = 'var(--accent-emerald-subtle)';
-      } else {
-        const orig = box.dataset.step || 'STEP';
-        if (numEl) numEl.innerHTML = orig;
-        box.style.borderColor = '';
-        box.style.background = '';
-      }
-    }
-    box.addEventListener('click', toggleStep);
-    box.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault();
-        toggleStep();
-      }
-    });
-  });
-
-  // 8. Drawer / Modal with focus trap
-  const FOCUSABLE = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-
-  function getFocusable() {
-    return modalOverlay.querySelectorAll(FOCUSABLE);
-  }
-
-  function openModal(skillId) {
-    const item = skills.find(s => s.id === skillId);
-    if (!item || !modalOverlay) return;
-
-    const modalBody = document.getElementById('modal-body-container');
-    if (!modalBody) return;
-
-    const isUser = item.type === 'user';
-    const typeBadge = isUser ? 'badge-blue' : 'badge-purple';
-    const typeLabel = isUser ? '用户调用 (Orchestration · 编排)' : '模型调用 (Discipline · 纪律)';
-    const catBadge = item.category === 'engineering' ? 'badge-emerald' : 'badge-amber';
-    const catLabel = item.category === 'engineering' ? '工程实践' : '效率工具';
-
-    modalBody.innerHTML = `
-      <div class="modal-head-row">
-        <h2 id="modal-title" class="modal-title">/${item.name}</h2>
-        <div class="modal-badges-row">
-          <span class="badge ${catBadge}">${catLabel}</span>
-          <span class="badge ${typeBadge}">${typeLabel}</span>
-        </div>
-      </div>
-      <p class="modal-desc">${item.desc}</p>
-
-      <div class="modal-section-box">
-        <h4 class="modal-section-title">运作机制与设计初衷</h4>
-        <p class="modal-section-body">${item.longDesc}</p>
-      </div>
-
-      <div class="modal-section">
-        <h4 class="modal-section-title">执行指令格式</h4>
-        <div class="install-command-bar modal-cmd-bar">
-          <code>${item.exampleCmd}</code>
-          <button class="btn btn-secondary modal-copy-btn" id="modal-copy-btn" type="button">
-            复制
-          </button>
-        </div>
-      </div>
-
-      <div class="modal-foot-row">
-        <div class="modal-tags-row">
-          ${item.tags.map(t => `<span class="kbd">#${t}</span>`).join('')}
-        </div>
-        <a href="${item.githubUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary modal-github-btn">
-          查看 SKILL.md 规范 ↗
-        </a>
-      </div>
-    `;
-
-    const copyBtn = document.getElementById('modal-copy-btn');
-    if (copyBtn) {
-      copyBtn.addEventListener('click', () => {
-        copyText(item.exampleCmd, `已复制: ${item.exampleCmd}`);
-      });
-    }
-
-    modalOverlay.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    lastFocusedEl = document.activeElement;
-    const dialogEl = modalOverlay.querySelector('.modal-dialog');
-    if (dialogEl) dialogEl.focus();
-  }
-
-  function closeModal() {
-    if (!modalOverlay) return;
-    modalOverlay.classList.remove('open');
-    document.body.style.overflow = '';
-    if (lastFocusedEl && lastFocusedEl.focus) lastFocusedEl.focus();
-  }
-
-  // Focus trap inside modal
-  if (modalOverlay) {
-    modalOverlay.addEventListener('keydown', (e) => {
-      if (e.key !== 'Tab' || !modalOverlay.classList.contains('open')) return;
-
-      const focusable = getFocusable();
-      if (focusable.length === 0) return;
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-
-      if (e.shiftKey) {
-        if (document.activeElement === first || document.activeElement === modalOverlay) {
-          e.preventDefault();
-          last.focus();
-        }
-      } else {
-        if (document.activeElement === last) {
-          e.preventDefault();
-          first.focus();
-        }
-      }
-    });
-
-    modalOverlay.addEventListener('click', (e) => {
-      if (e.target === modalOverlay) closeModal();
-    });
-  }
-
-  if (modalCloseBtn) modalCloseBtn.addEventListener('click', closeModal);
-
-  // 9. Clipboard Copy & Toast
-  function copyText(text, msg) {
-    if (navigator.clipboard && window.isSecureContext) {
-      navigator.clipboard.writeText(text).then(() => {
-        showToast(msg || '已成功复制到剪贴板！');
-      }).catch(() => fallbackCopy(text, msg));
+  window.copyText = function (text, toastMsg) {
+    const msg = toastMsg || '已复制！';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        () => showToast(msg),
+        () => fallbackCopy(text, msg)
+      );
     } else {
       fallbackCopy(text, msg);
     }
-  }
+  };
 
   function fallbackCopy(text, msg) {
     const ta = document.createElement('textarea');
     ta.value = text;
     ta.style.position = 'fixed';
-    ta.style.left = '-9999px';
+    ta.style.opacity = '0';
     document.body.appendChild(ta);
-    ta.focus();
     ta.select();
     try {
       document.execCommand('copy');
-      showToast(msg || '已成功复制到剪贴板！');
+      showToast(msg);
     } catch (e) {
-      showToast('复制失败，请手动选择复制');
+      showToast('复制失败，请手动复制');
     }
     document.body.removeChild(ta);
   }
 
   function showToast(msg) {
-    if (!toastContainer) return;
-    const toast = document.createElement('div');
-    toast.className = 'toast-pill';
-    toast.setAttribute('role', 'status');
-    toast.setAttribute('aria-live', 'polite');
-    toast.innerHTML = `<svg width="15" height="15" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg> <span>${msg}</span>`;
-    toastContainer.appendChild(toast);
-
-    setTimeout(() => toast.classList.add('show'), 10);
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+    const pill = document.createElement('div');
+    pill.className = 'toast-pill';
+    pill.textContent = msg;
+    container.appendChild(pill);
+    requestAnimationFrame(() => pill.classList.add('show'));
     setTimeout(() => {
-      toast.classList.remove('show');
-      setTimeout(() => toast.remove(), 300);
-    }, 2500);
+      pill.classList.remove('show');
+      setTimeout(() => pill.remove(), 400);
+    }, 2400);
   }
 
-  // 10. Installation Tabs
-  const installTabs = document.querySelectorAll('.install-tab-btn');
-  const installPanels = document.querySelectorAll('.install-panel-view');
+  /* ── Header: scroll shadow + mobile menu ── */
+  function initHeader() {
+    const header = document.querySelector('.site-header');
+    const navToggle = document.getElementById('nav-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
 
-  installTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      installTabs.forEach(t => {
-        t.classList.remove('active');
-        t.setAttribute('aria-selected', 'false');
+    let ticking = false;
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        if (window.scrollY > 8) header.classList.add('scrolled');
+        else header.classList.remove('scrolled');
+        ticking = false;
       });
-      installPanels.forEach(p => p.style.display = 'none');
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
 
-      tab.classList.add('active');
-      tab.setAttribute('aria-selected', 'true');
-      const targetId = tab.dataset.target;
-      const targetPanel = document.getElementById(targetId);
-      if (targetPanel) targetPanel.style.display = 'block';
+    if (navToggle && mobileMenu) {
+      navToggle.addEventListener('click', () => {
+        const isOpen = mobileMenu.classList.toggle('open');
+        navToggle.classList.toggle('open', isOpen);
+        navToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+      mobileMenu.querySelectorAll('.mobile-nav-link').forEach((link) => {
+        link.addEventListener('click', () => {
+          mobileMenu.classList.remove('open');
+          navToggle.classList.remove('open');
+          navToggle.setAttribute('aria-expanded', 'false');
+        });
+      });
+    }
+
+    // Active nav link based on scroll position
+    const sections = document.querySelectorAll('main section[id]');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const navMap = {};
+    navLinks.forEach((l) => {
+      const href = l.getAttribute('href');
+      if (href && href.startsWith('#')) navMap[href.slice(1)] = l;
     });
-  });
 
-  // Install tab keyboard navigation (left/right arrows)
-  const installTabList = document.querySelector('.install-tab-header');
-  if (installTabList) {
-    installTabList.setAttribute('role', 'tablist');
-    installTabs.forEach((tab, idx) => {
-      tab.setAttribute('role', 'tab');
-      tab.setAttribute('aria-selected', tab.classList.contains('active') ? 'true' : 'false');
-      tab.setAttribute('tabindex', tab.classList.contains('active') ? '0' : '-1');
-      tab.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+    let scrollTicking = false;
+    function updateActiveNav() {
+      if (scrollTicking) return;
+      scrollTicking = true;
+      requestAnimationFrame(() => {
+        let current = '';
+        sections.forEach((sec) => {
+          const top = sec.offsetTop - 120;
+          if (window.scrollY >= top) current = sec.id;
+        });
+        navLinks.forEach((l) => l.classList.remove('active'));
+        if (current && navMap[current]) navMap[current].classList.add('active');
+        scrollTicking = false;
+      });
+    }
+    window.addEventListener('scroll', updateActiveNav, { passive: true });
+    updateActiveNav();
+  }
+
+  /* ── Theme toggle ── */
+  function initTheme() {
+    const toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
+    const root = document.documentElement;
+
+    // Load saved theme
+    const saved = localStorage.getItem('mp-theme');
+    if (saved) root.setAttribute('data-theme', saved);
+
+    function updateLabel() {
+      const isDark = root.getAttribute('data-theme') !== 'light';
+      toggle.setAttribute('aria-label', isDark ? '切换到浅色模式' : '切换到深色模式');
+    }
+    updateLabel();
+
+    toggle.addEventListener('click', () => {
+      const isDark = root.getAttribute('data-theme') !== 'light';
+      const next = isDark ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('mp-theme', next);
+      updateLabel();
+    });
+  }
+
+  /* ── Copy triggers ── */
+  function initCopyTriggers() {
+    document.addEventListener('click', (e) => {
+      const btn = e.target.closest('.copy-trigger');
+      if (!btn) return;
+      const sel = btn.getAttribute('data-target');
+      if (!sel) return;
+      const targetEl = document.querySelector(sel);
+      if (!targetEl) return;
+      const text = targetEl.textContent.trim();
+      window.copyText(text, '已复制：' + text);
+    });
+  }
+
+  /* ── Diff showcase ── */
+  const DIFF_SCENARIOS = {
+    video: {
+      title: '// course-video-manager 的 CONTEXT.md 落地效果',
+      before: '"当课程里某个章节中的一课被\'实体化\'（即被赋予了文件系统中的某个位置）时，会出问题。"',
+      after: '"实体化级联（materialization cascade）出问题了。"',
+      beforeNote: '⚠️ Agent 需阅读长篇解释，长会话中极易概念漂移。',
+      afterNote: '✅ 命名一致，Agent 导航更精准，思考消耗更少 Token。',
+      savings: 80,
+    },
+    triage: {
+      title: '// 工单分派流程的术语统一',
+      before: '"这个 issue 是 bug 还是 feature request？如果是 bug 优先级是 P0 还是 P1？要不要加 blocked 标签？"',
+      after: '"按 triage 状态机角色流转，自动定级为 P1-bug-ready。"',
+      beforeNote: '⚠️ Agent 反复追问相同问题，每次工单处理耗 1200+ Token。',
+      afterNote: '✅ 状态机角色驱动，工单一次性分类，Token 消耗降至 280。',
+      savings: 76,
+    },
+    deepening: {
+      title: '// 计费系统的深模块收敛',
+      before: '"UserBillingWrapper 调 FormatUtils 再调 TokenHelper 再调 BillingCalculator，经过 4 层浅封装才到核心逻辑。"',
+      after: '"BillingEngine.process(usage) → 返回 Invoice，一个深接口搞定。"',
+      beforeNote: '⚠️ 4 个浅模块对外方法数与实现行数比 1:1.1，极度违反深模块原则。',
+      afterNote: '✅ 收敛至深模块 BillingEngine，接口比 1:5.2，可维护性飙升。',
+      savings: 68,
+    },
+  };
+
+  function initDiffShowcase() {
+    const tabs = document.querySelectorAll('.diff-tab-btn');
+    const titleEl = document.getElementById('diff-scenario-title');
+    const beforeEl = document.getElementById('diff-before-text');
+    const afterEl = document.getElementById('diff-after-text');
+    const beforeNote = document.getElementById('diff-before-note');
+    const afterNote = document.getElementById('diff-after-note');
+    const gaugeFill = document.getElementById('diff-gauge-fill');
+    const gaugeText = document.getElementById('diff-gauge-text');
+    const savingsBadge = document.getElementById('diff-savings-badge');
+
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const key = tab.dataset.scenario;
+        const data = DIFF_SCENARIOS[key];
+        if (!data) return;
+        tabs.forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
+        if (titleEl) titleEl.textContent = data.title;
+        if (beforeEl) beforeEl.textContent = data.before;
+        if (afterEl) afterEl.textContent = data.after;
+        if (beforeNote) beforeNote.textContent = data.beforeNote;
+        if (afterNote) afterNote.textContent = data.afterNote;
+        if (gaugeFill) gaugeFill.style.width = data.savings + '%';
+        if (gaugeText) gaugeText.textContent = 'Token 消耗减少 ' + data.savings + '%';
+        if (savingsBadge) savingsBadge.textContent = 'Token 节省 ' + data.savings + '%';
+      });
+    });
+  }
+
+  /* ── Install tabs ── */
+  function initInstallTabs() {
+    const tabs = document.querySelectorAll('.install-tab-btn');
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const target = tab.dataset.target;
+        tabs.forEach((t) => t.classList.remove('active'));
+        tab.classList.add('active');
+        document.querySelectorAll('.install-panel-view').forEach((p) => {
+          p.style.display = 'none';
+        });
+        const panel = document.getElementById(target);
+        if (panel) panel.style.display = 'block';
+      });
+    });
+  }
+
+  /* ── Setup steps ── */
+  function initSetupSteps() {
+    const steps = document.querySelectorAll('.setup-step-box');
+    steps.forEach((step) => {
+      const toggle = () => {
+        steps.forEach((s) => {
+          if (s !== step) s.classList.remove('completed');
+        });
+        step.classList.toggle('completed');
+      };
+      step.addEventListener('click', toggle);
+      step.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
-          const dir = e.key === 'ArrowRight' ? 1 : -1;
-          const nextIdx = (idx + dir + installTabs.length) % installTabs.length;
-          installTabs[nextIdx].focus();
-          installTabs[nextIdx].click();
+          toggle();
         }
       });
     });
   }
 
-  // Global trigger buttons for code copy
-  document.querySelectorAll('.copy-trigger').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const targetSelector = btn.dataset.target;
-      const el = document.querySelector(targetSelector);
-      if (el) copyText(el.innerText.trim(), '已复制代码到剪贴板！');
-    });
-  });
+  /* ── Reveal on scroll ── */
+  function initReveal() {
+    const revealEls = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window) || revealEls.length === 0) {
+      revealEls.forEach((el) => el.classList.add('revealed'));
+      return;
+    }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+    );
+    revealEls.forEach((el) => observer.observe(el));
+  }
 
-  // Terminal tab ARIA sync
-  const termTabs = document.querySelectorAll('.term-tab-btn');
-  termTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      termTabs.forEach(t => {
-        t.classList.remove('active');
-        t.setAttribute('aria-selected', 'false');
+  /* ── Skills rendering ── */
+  let currentFilter = 'all';
+  let currentSearch = '';
+  let currentView = 'grid';
+
+  function getFiltered() {
+    return SKILLS.filter((s) => {
+      if (currentFilter !== 'all') {
+        if (currentFilter === 'engineering' || currentFilter === 'productivity') {
+          if (s.category !== currentFilter) return false;
+        } else if (currentFilter === 'user' || currentFilter === 'model') {
+          if (s.type !== currentFilter) return false;
+        }
+      }
+      if (currentSearch) {
+        const q = currentSearch.toLowerCase();
+        return (
+          s.name.toLowerCase().includes(q) ||
+          s.desc.toLowerCase().includes(q) ||
+          s.tags.some((t) => t.toLowerCase().includes(q)) ||
+          (s.stageZh || '').toLowerCase().includes(q)
+        );
+      }
+      return true;
+    });
+  }
+
+  function skillTypeBadge(type) {
+    if (type === 'user') return '<span class="badge badge-blue">用户调用</span>';
+    return '<span class="badge badge-amber">模型调用</span>';
+  }
+
+  function renderSkillsGrid(list) {
+    const grid = document.getElementById('skills-grid');
+    if (!grid) return;
+    if (list.length === 0) {
+      grid.innerHTML =
+        '<div class="skills-empty-state"><p class="skills-empty-text">// 没有匹配的技能</p><button class="btn btn-secondary" id="reset-filters-btn">重置筛选</button></div>';
+      const resetBtn = document.getElementById('reset-filters-btn');
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          currentFilter = 'all';
+          currentSearch = '';
+          document.querySelectorAll('.filter-btn').forEach((b) => b.classList.remove('active'));
+          document.querySelector('.filter-btn[data-filter="all"]').classList.add('active');
+          const search = document.getElementById('skills-search');
+          if (search) search.value = '';
+          renderSkills();
+        });
+      }
+      return;
+    }
+    grid.innerHTML = list
+      .map((s, i) => {
+        const num = String(i + 1).padStart(2, '0');
+        const tagsHTML = s.tags
+          .slice(0, 4)
+          .map((t) => '<span class="badge">' + escapeHTML(t) + '</span>')
+          .join('');
+        return (
+          '<article class="clean-card skill-box-card" data-skill-id="' +
+          escapeHTML(s.id) + '" data-num="SKILL ' + num + '" tabindex="0" role="button">' +
+          '<div class="skill-box-top">' +
+          '<h3 class="skill-box-name">' + escapeHTML(s.name) + '</h3>' +
+          '<div class="skill-box-badges">' + skillTypeBadge(s.type) + '</div>' +
+          '</div>' +
+          '<p class="skill-box-desc">' + escapeHTML(s.desc) + '</p>' +
+          '<div class="skill-box-tags">' + tagsHTML + '</div>' +
+          '<div class="skill-box-foot">' +
+          '<span class="mono-label">' + escapeHTML(s.stageZh) + '</span>' +
+          '<button class="btn-skill-action" type="button">查看详情 →</button>' +
+          '</div>' +
+          '</article>'
+        );
+      })
+      .join('');
+
+    grid.querySelectorAll('.skill-box-card').forEach((card) => {
+      const open = () => openSkillModal(card.dataset.skillId);
+      card.addEventListener('click', open);
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          open();
+        }
       });
-      tab.classList.add('active');
-      tab.setAttribute('aria-selected', 'true');
     });
+  }
+
+  function renderSkillsTable(list) {
+    const wrap = document.getElementById('skills-table-wrap');
+    if (!wrap) return;
+    if (list.length === 0) {
+      wrap.innerHTML =
+        '<div class="skills-empty-state"><p class="skills-empty-text">// 没有匹配的技能</p></div>';
+      return;
+    }
+    wrap.innerHTML =
+      '<table class="skills-dense-table"><thead><tr>' +
+      '<th>技能</th><th>类型</th><th>描述</th><th>阶段</th>' +
+      '</tr></thead><tbody>' +
+      list
+        .map((s) => {
+          return (
+            '<tr class="skill-table-row" data-skill-id="' + escapeHTML(s.id) + '" tabindex="0" role="button">' +
+            '<td class="skill-table-name">' + escapeHTML(s.name) + '</td>' +
+            '<td>' + skillTypeBadge(s.type) + '</td>' +
+            '<td class="skill-table-desc">' + escapeHTML(s.desc) + '</td>' +
+            '<td>' + escapeHTML(s.stageZh) + '</td>' +
+            '</tr>'
+          );
+        })
+        .join('') +
+      '</tbody></table>';
+
+    wrap.querySelectorAll('.skill-table-row').forEach((row) => {
+      const open = () => openSkillModal(row.dataset.skillId);
+      row.addEventListener('click', open);
+      row.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          open();
+        }
+      });
+    });
+  }
+
+  function renderSkills() {
+    const filtered = getFiltered();
+    const countEl = document.getElementById('skills-count');
+    if (countEl) {
+      countEl.textContent = '// 共 ' + filtered.length + ' / ' + SKILLS.length + ' 个技能';
+    }
+    if (currentView === 'grid') {
+      renderSkillsGrid(filtered);
+    } else {
+      renderSkillsTable(filtered);
+    }
+  }
+
+  /* ── Skill modal ── */
+  let lastFocused = null;
+
+  function openSkillModal(skillId) {
+    const skill = SKILLS.find((s) => s.id === skillId);
+    if (!skill) return;
+    const modal = document.getElementById('skill-modal');
+    const dialog = document.getElementById('modal-dialog-inner');
+    if (!modal || !dialog) return;
+
+    lastFocused = document.activeElement;
+
+    const tagsHTML = skill.tags
+      .map((t) => '<span class="badge">' + escapeHTML(t) + '</span>')
+      .join('');
+
+    dialog.innerHTML =
+      '<button class="modal-close-btn" id="modal-close" type="button" aria-label="关闭">×</button>' +
+      '<div class="modal-head-row">' +
+      '<h3 id="modal-title" class="modal-title">' + escapeHTML(skill.name) + '</h3>' +
+      '<div class="modal-badges-row">' + skillTypeBadge(skill.type) +
+      '<span class="badge badge-purple">' + escapeHTML(skill.categoryZh) + '</span></div>' +
+      '</div>' +
+      '<p class="modal-desc">' + escapeHTML(skill.desc) + '</p>' +
+      '<div class="modal-section">' +
+      '<div class="modal-section-title">// 详细说明</div>' +
+      '<div class="modal-section-body">' + escapeHTML(skill.longDesc) + '</div>' +
+      '</div>' +
+      '<div class="modal-section-box">' +
+      '<div class="modal-section-title">// 调用方式</div>' +
+      '<div class="modal-section-body">' +
+      '<div class="install-command-bar modal-cmd-bar">' +
+      '<code>' + escapeHTML(skill.exampleCmd) + '</code>' +
+      '<button class="btn btn-secondary modal-copy-btn copy-trigger" data-target=".modal-cmd-bar code" type="button">复制</button>' +
+      '</div>' +
+      '</div>' +
+      '</div>' +
+      '<div class="modal-foot-row">' +
+      '<div class="modal-tags-row">' + tagsHTML + '</div>' +
+      '<a href="' + escapeHTML(skill.githubUrl) + '" target="_blank" rel="noopener noreferrer" class="btn btn-secondary modal-github-btn">GitHub 文档 ↗</a>' +
+      '</div>';
+
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+
+    const closeBtn = document.getElementById('modal-close');
+    if (closeBtn) closeBtn.focus();
+
+    function onKeydown(e) {
+      if (e.key === 'Escape') {
+        closeModal();
+      } else if (e.key === 'Tab') {
+        trapFocus(e, dialog);
+      }
+    }
+    document.addEventListener('keydown', onKeydown);
+
+    if (closeBtn) closeBtn.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) closeModal();
+    });
+
+    function closeModal() {
+      modal.classList.remove('open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      document.removeEventListener('keydown', onKeydown);
+      if (lastFocused) lastFocused.focus();
+    }
+  }
+
+  function trapFocus(e, container) {
+    const focusables = container.querySelectorAll(
+      'button, a, input, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusables.length === 0) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
+  /* ── Skills controls (filter, search, view switch) ── */
+  function initSkillsControls() {
+    // Filters
+    document.querySelectorAll('.filter-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentFilter = btn.dataset.filter;
+        renderSkills();
+      });
+    });
+
+    // Search
+    const search = document.getElementById('skills-search');
+    if (search) {
+      let searchTimer = null;
+      search.addEventListener('input', (e) => {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+          currentSearch = e.target.value.trim();
+          renderSkills();
+        }, 150);
+      });
+    }
+
+    // View switch
+    document.querySelectorAll('.view-switch-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.view-switch-btn').forEach((b) => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentView = btn.dataset.view;
+        const grid = document.getElementById('skills-grid');
+        const table = document.getElementById('skills-table-wrap');
+        if (currentView === 'grid') {
+          if (grid) grid.style.display = '';
+          if (table) table.style.display = 'none';
+        } else {
+          if (grid) grid.style.display = 'none';
+          if (table) table.style.display = '';
+        }
+        renderSkills();
+      });
+    });
+
+    // Keyboard shortcut: "/" to focus search
+    document.addEventListener('keydown', (e) => {
+      if (e.key === '/' && document.activeElement.tagName !== 'INPUT' && document.activeElement.tagName !== 'TEXTAREA') {
+        const s = document.getElementById('skills-search');
+        if (s) {
+          e.preventDefault();
+          s.focus();
+        }
+      }
+    });
+  }
+
+  /* ── Skill chips & command pills ── */
+  function initSkillChips() {
+    document.addEventListener('click', (e) => {
+      const chip = e.target.closest('[data-skill]');
+      if (!chip) return;
+      const skillId = chip.dataset.skill;
+      // Scroll to skills section first
+      const skillsSection = document.getElementById('skills-matrix');
+      if (skillsSection) skillsSection.scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => openSkillModal(skillId), 500);
+    });
+  }
+
+  /* ── Init all ── */
+  document.addEventListener('DOMContentLoaded', () => {
+    initHeader();
+    initTheme();
+    initCopyTriggers();
+    initDiffShowcase();
+    initInstallTabs();
+    initSetupSteps();
+    initReveal();
+    initSkillsControls();
+    initSkillChips();
+    renderSkills();
   });
-
-  window.openSkillModal = openModal;
-  window.copyText = copyText;
-
-  renderSkills();
-});
+})();
