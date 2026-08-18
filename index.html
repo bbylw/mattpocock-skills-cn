@@ -1,499 +1,1081 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN" data-theme="dark">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Skills // 写给真正工程师的 Agent 技能集</title>
-  <meta name="description" content="Matt Pocock 专为真正工程师打造的 Agent 技能集。做正经工程，拒绝氛围编程。小巧、易改造、可组合。">
-  <meta name="keywords" content="Claude Code, Codex, Skills, Matt Pocock, 软件工程, TDD, DDD, 深模块">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Skills // 写给真正工程师的 Agent 技能集</title>
+    <meta
+      name="description"
+      content="Matt Pocock 专为真正工程师打造的 Agent 技能集。做正经工程，拒绝氛围编程。小巧、易改造、可组合。"
+    />
+    <meta
+      name="keywords"
+      content="Claude Code, Codex, Skills, Matt Pocock, 软件工程, TDD, DDD, 深模块"
+    />
+    <meta name="theme-color" content="#0a0a0b" />
+    <link rel="icon" href="favicon.svg" type="image/svg+xml" />
 
-  <meta property="og:title" content="Skills // 写给真正工程师的 Agent 技能集">
-  <meta property="og:description" content="做正经工程，而不是「氛围编程」。小巧、易改造、可组合的 Agent 技能集。">
-  <meta property="og:type" content="website">
+    <meta
+      property="og:title"
+      content="Skills // 写给真正工程师的 Agent 技能集"
+    />
+    <meta
+      property="og:description"
+      content="做正经工程，而不是「氛围编程」。小巧、易改造、可组合的 Agent 技能集。"
+    />
+    <meta property="og:type" content="website" />
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
-  <link rel="stylesheet" href="css/tokens.css">
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/components.css">
-</head>
-<body>
-  <a class="skip-link" href="#main">跳到主要内容</a>
+    <link rel="stylesheet" href="css/tokens.css" />
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/components.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
 
-  <div class="ambient-bg"></div>
+    <div class="ambient-bg"></div>
 
-  <!-- ═══ HEADER ═══ -->
-  <header class="site-header">
-    <div class="container nav-container">
-      <a href="#" class="brand-wrap">
-        <div class="brand-emblem">
-          <svg width="16" height="16" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        </div>
-        <span>matt_pocock/skills</span>
-      </a>
-
-      <ul class="nav-menu">
-        <li><a href="#philosophy" class="nav-link">为什么</a></li>
-        <li><a href="#terminal-section" class="nav-link">演示</a></li>
-        <li><a href="#skills-matrix" class="nav-link">技能矩阵</a></li>
-        <li><a href="#installation" class="nav-link">安装</a></li>
-      </ul>
-
-      <div class="nav-actions">
-        <button id="theme-toggle" class="icon-btn" type="button" aria-label="切换到浅色模式" title="切换主题">
-          <svg class="theme-icon theme-icon-moon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          <svg class="theme-icon theme-icon-sun" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
-        </button>
-        <a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer" class="btn btn-secondary github-nav-btn">
-          <svg width="15" height="15" aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          <span>GitHub ↗</span>
+    <!-- ═══ HEADER ═══ -->
+    <header class="site-header">
+      <div class="container nav-container">
+        <a href="#" class="brand-wrap">
+          <div class="brand-emblem">
+            <svg
+              width="16"
+              height="16"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+            </svg>
+          </div>
+          <span>matt_pocock/skills</span>
         </a>
-        <button id="nav-toggle" class="hamburger-btn" type="button" aria-label="打开导航菜单" aria-expanded="false" aria-controls="mobile-menu">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </div>
 
-    <nav id="mobile-menu" class="mobile-menu" aria-label="移动端导航">
-      <a href="#philosophy" class="mobile-nav-link">为什么</a>
-      <a href="#terminal-section" class="mobile-nav-link">演示</a>
-      <a href="#skills-matrix" class="mobile-nav-link">技能矩阵</a>
-      <a href="#installation" class="mobile-nav-link">安装</a>
-    </nav>
-  </header>
+        <ul class="nav-menu">
+          <li><a href="#philosophy" class="nav-link">为什么</a></li>
+          <li><a href="#terminal-section" class="nav-link">演示</a></li>
+          <li><a href="#skills-matrix" class="nav-link">技能矩阵</a></li>
+          <li><a href="#installation" class="nav-link">安装</a></li>
+        </ul>
 
-  <main id="main">
-    <!-- ═══ HERO ═══ -->
-    <section class="hero-section">
-      <div class="container">
-        <div class="hero-pill-badge reveal">
-          <span class="hero-dot"></span>
-          <span>正经工程 · 拒绝氛围编程</span>
-        </div>
-
-        <h1 class="hero-title reveal" style="--reveal-delay: 0.08s;">
-          写给真正工程师的<br>
-          <span class="hero-gradient-text">Agent 技能集</span>
-        </h1>
-
-        <p class="hero-subtitle reveal" style="--reveal-delay: 0.16s;">
-          开发真正的应用程序是困难的。像 GSD、BMAD、Spec-Kit 这类方案试图通过接管整个流程来提供帮助，但夺走了你的控制权，也让流程中出现的 Bug 难以排查。<br><br>
-          这些技能的设计理念是<strong>小巧、易改造、可组合</strong>。它们适用于任何模型，建立在数十年的软件工程经验之上。随便折腾，把它们变成你自己的。
-        </p>
-
-        <div class="hero-cli-container reveal" style="--reveal-delay: 0.24s;">
-          <code>claude plugins install mattpocock-skills</code>
-          <button class="btn btn-secondary hero-copy-btn copy-trigger" data-target=".hero-cli-container code" type="button">复制</button>
-        </div>
-
-        <div class="hero-cmd-cloud reveal" style="--reveal-delay: 0.32s;">
-          <span class="cmd-cloud-label">// 常用指令</span>
-          <button class="cmd-pill" data-skill="grill-with-docs">/grill-with-docs</button>
-          <button class="cmd-pill" data-skill="tdd">/tdd</button>
-          <button class="cmd-pill" data-skill="improve-codebase-architecture">/improve-codebase-architecture</button>
-          <button class="cmd-pill" data-skill="diagnosing-bugs">/diagnosing-bugs</button>
-          <button class="cmd-pill" data-skill="ask-matt">/ask-matt</button>
-        </div>
-
-        <div class="hero-actions-row reveal" style="--reveal-delay: 0.4s;">
-          <a href="#skills-matrix" class="btn btn-primary">
-            <svg width="16" height="16" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
-            探索 25+ 技能全景
+        <div class="nav-actions">
+          <button
+            id="theme-toggle"
+            class="icon-btn"
+            type="button"
+            aria-label="切换到浅色模式"
+            title="切换主题"
+          >
+            <svg
+              class="theme-icon theme-icon-moon"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+            </svg>
+            <svg
+              class="theme-icon theme-icon-sun"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="4" />
+              <path
+                d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+              />
+            </svg>
+          </button>
+          <a
+            href="https://github.com/mattpocock/skills"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-secondary github-nav-btn"
+          >
+            <svg
+              width="15"
+              height="15"
+              aria-hidden="true"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path
+                d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"
+              />
+            </svg>
+            <span>GitHub ↗</span>
           </a>
-          <a href="#philosophy" class="btn btn-secondary">了解设计哲学</a>
+          <button
+            id="nav-toggle"
+            class="hamburger-btn"
+            type="button"
+            aria-label="打开导航菜单"
+            aria-expanded="false"
+            aria-controls="mobile-menu"
+          >
+            <span></span><span></span><span></span>
+          </button>
         </div>
-
-        <dl class="hero-metric-capsules reveal" style="--reveal-delay: 0.48s;">
-          <div class="metric-capsule">
-            <svg width="16" height="16" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-            <dt><strong>60,000+</strong> 开发者订阅</dt>
-          </div>
-          <div class="metric-capsule">
-            <svg width="16" height="16" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <dt><strong>Claude Code / Codex</strong> 原生支持</dt>
-          </div>
-          <div class="metric-capsule">
-            <svg width="16" height="16" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <dt><strong>30 秒</strong> 极速集成</dt>
-          </div>
-        </dl>
       </div>
-    </section>
 
-    <!-- ═══ PHILOSOPHY ═══ -->
-    <section id="philosophy" class="section">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="section-tagline">core philosophy</span>
-          <h2 class="section-title">这些技能为何存在？</h2>
-          <p class="section-subtitle">
-            我构建这些技能，是为了修复我在 Claude Code、Codex 及其他编码 Agent 上看到的 <strong>4 大常见失败模式</strong>。
-          </p>
-        </div>
+      <nav id="mobile-menu" class="mobile-menu" aria-label="移动端导航">
+        <a href="#philosophy" class="mobile-nav-link">为什么</a>
+        <a href="#terminal-section" class="mobile-nav-link">演示</a>
+        <a href="#skills-matrix" class="mobile-nav-link">技能矩阵</a>
+        <a href="#installation" class="mobile-nav-link">安装</a>
+      </nav>
+    </header>
 
-        <div class="philosophy-grid reveal" style="--reveal-delay: 0.1s;">
-          <!-- Mode 1 -->
-          <article class="clean-card issue-card">
-            <div class="issue-card-head">
-              <h3 class="issue-card-title">#1 Agent 没做我想要的</h3>
-              <span class="badge badge-blue">目标对齐</span>
+    <main id="main">
+      <!-- ═══ HERO ═══ -->
+      <section class="hero-section">
+        <div class="container">
+          <div class="hero-layout">
+            <div class="hero-copy-stack">
+              <div class="hero-pill-badge reveal">
+                <span class="hero-dot"></span>
+                <span>正经工程 · 拒绝氛围编程</span>
+              </div>
+
+              <h1 class="hero-title reveal" style="--reveal-delay: 0.08s">
+                写给真正工程师的<br />
+                <span class="hero-gradient-text">Agent 技能集</span>
+              </h1>
+
+              <p class="hero-subtitle reveal" style="--reveal-delay: 0.16s">
+                开发真正的应用程序是困难的。像 GSD、BMAD、Spec-Kit
+                这类方案试图通过接管整个流程来提供帮助，但夺走了你的控制权，也让流程中出现的
+                Bug 难以排查。<br /><br />
+                这些技能的设计理念是<strong>小巧、易改造、可组合</strong>。它们适用于任何模型，建立在数十年的软件工程经验之上。随便折腾，把它们变成你自己的。
+              </p>
+
+              <div
+                class="hero-cli-container reveal"
+                style="--reveal-delay: 0.24s"
+              >
+                <code>claude plugins install mattpocock-skills</code>
+                <button
+                  class="btn btn-secondary hero-copy-btn copy-trigger"
+                  data-target=".hero-cli-container code"
+                  type="button"
+                >
+                  复制
+                </button>
+              </div>
+
+              <div class="hero-cmd-cloud reveal" style="--reveal-delay: 0.32s">
+                <span class="cmd-cloud-label">// 常用指令</span>
+                <button class="cmd-pill" data-skill="grill-with-docs">
+                  /grill-with-docs
+                </button>
+                <button class="cmd-pill" data-skill="tdd">/tdd</button>
+                <button
+                  class="cmd-pill"
+                  data-skill="improve-codebase-architecture"
+                >
+                  /improve-codebase-architecture
+                </button>
+                <button class="cmd-pill" data-skill="diagnosing-bugs">
+                  /diagnosing-bugs
+                </button>
+                <button class="cmd-pill" data-skill="ask-matt">
+                  /ask-matt
+                </button>
+              </div>
+
+              <div class="hero-actions-row reveal" style="--reveal-delay: 0.4s">
+                <a href="#skills-matrix" class="btn btn-primary">
+                  <svg
+                    width="16"
+                    height="16"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect width="7" height="7" x="3" y="3" rx="1" />
+                    <rect width="7" height="7" x="14" y="3" rx="1" />
+                    <rect width="7" height="7" x="14" y="14" rx="1" />
+                    <rect width="7" height="7" x="3" y="14" rx="1" />
+                  </svg>
+                  探索 25+ 技能全景
+                </a>
+                <a href="#philosophy" class="btn btn-secondary">了解设计哲学</a>
+              </div>
+
+              <dl
+                class="hero-metric-capsules reveal"
+                style="--reveal-delay: 0.48s"
+              >
+                <div class="metric-capsule">
+                  <svg
+                    width="16"
+                    height="16"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--accent-cyan)"
+                    stroke-width="2"
+                  >
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                  </svg>
+                  <dt><strong>60,000+</strong> 开发者订阅</dt>
+                </div>
+                <div class="metric-capsule">
+                  <svg
+                    width="16"
+                    height="16"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--accent-emerald)"
+                    stroke-width="2"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <dt><strong>Claude Code / Codex</strong> 原生支持</dt>
+                </div>
+                <div class="metric-capsule">
+                  <svg
+                    width="16"
+                    height="16"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--accent-amber)"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  <dt><strong>30 秒</strong> 极速集成</dt>
+                </div>
+              </dl>
             </div>
-            <blockquote class="master-quote">
-              "没有人能确切知道自己想要什么。"
-              <cite>— David Thomas & Andrew Hunt · 程序员修炼之道</cite>
-            </blockquote>
-            <p class="issue-body-text">
-              <strong>问题根源：</strong>软件开发中最常见的失败模式就是目标不一致。你以为开发者知道你想要什么，交付时才发现南辕北辙。在 AI 时代也一样，你和 Agent 之间存在沟通鸿沟。解决办法是一场<strong>严拷式会话（Grilling Session）</strong>——让 Agent 就你正在构建的东西向你提出详细问题。
+
+            <aside
+              class="hero-system-panel reveal"
+              style="--reveal-delay: 0.28s"
+              aria-label="技能工作流概览"
+            >
+              <div class="system-panel-topbar">
+                <span></span><span></span><span></span
+                ><strong>agent_skill_graph</strong>
+              </div>
+              <div class="system-orbit" aria-hidden="true">
+                <div class="orbit-ring orbit-ring-a"></div>
+                <div class="orbit-ring orbit-ring-b"></div>
+                <div class="orbit-core">SKILLS</div>
+                <span class="orbit-node node-a">TDD</span>
+                <span class="orbit-node node-b">DDD</span>
+                <span class="orbit-node node-c">ADR</span>
+                <span class="orbit-node node-d">QA</span>
+              </div>
+              <div class="system-flow-list">
+                <div>
+                  <span>01</span><strong>Grill</strong><em>对齐目标</em>
+                </div>
+                <div>
+                  <span>02</span><strong>Model</strong><em>统一语言</em>
+                </div>
+                <div><span>03</span><strong>Test</strong><em>反馈闭环</em></div>
+                <div>
+                  <span>04</span><strong>Deepen</strong><em>压低熵增</em>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ PHILOSOPHY ═══ -->
+      <section id="philosophy" class="section">
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="section-tagline">core philosophy</span>
+            <h2 class="section-title">这些技能为何存在？</h2>
+            <p class="section-subtitle">
+              我构建这些技能，是为了修复我在 Claude Code、Codex 及其他编码 Agent
+              上看到的 <strong>4 大常见失败模式</strong>。
             </p>
-            <div class="solution-box">
-              <div class="solution-box-title">
-                <svg width="14" height="14" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="var(--accent-cyan)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>修复方案</span>
-              </div>
-              <p style="font-size: 0.85rem; color: var(--text-secondary);">在动手前与 Agent 彻底达成一致，深入思考正在做的改动。</p>
-              <div class="solution-skills-row">
-                <span class="solution-chip" data-skill="grill-with-docs">/grill-with-docs</span>
-                <span class="solution-chip" data-skill="grill-me">/grill-me</span>
-                <span class="solution-chip" data-skill="to-questionnaire">/to-questionnaire</span>
-              </div>
-            </div>
-          </article>
+          </div>
 
-          <!-- Mode 2 -->
-          <article class="clean-card issue-card">
-            <div class="issue-card-head">
-              <h3 class="issue-card-title">#2 Agent 太啰嗦了</h3>
-              <span class="badge badge-amber">领域建模</span>
+          <div class="philosophy-grid reveal" style="--reveal-delay: 0.1s">
+            <!-- Mode 1 -->
+            <article class="clean-card issue-card">
+              <div class="issue-card-head">
+                <h3 class="issue-card-title">#1 Agent 没做我想要的</h3>
+                <span class="badge badge-blue">目标对齐</span>
+              </div>
+              <blockquote class="master-quote">
+                "没有人能确切知道自己想要什么。"
+                <cite>— David Thomas & Andrew Hunt · 程序员修炼之道</cite>
+              </blockquote>
+              <p class="issue-body-text">
+                <strong>问题根源：</strong
+                >软件开发中最常见的失败模式就是目标不一致。你以为开发者知道你想要什么，交付时才发现南辕北辙。在
+                AI 时代也一样，你和 Agent
+                之间存在沟通鸿沟。解决办法是一场<strong
+                  >严拷式会话（Grilling Session）</strong
+                >——让 Agent 就你正在构建的东西向你提出详细问题。
+              </p>
+              <div class="solution-box">
+                <div class="solution-box-title">
+                  <svg
+                    width="14"
+                    height="14"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--accent-cyan)"
+                    stroke-width="2.5"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>修复方案</span>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-secondary)">
+                  在动手前与 Agent 彻底达成一致，深入思考正在做的改动。
+                </p>
+                <div class="solution-skills-row">
+                  <span class="solution-chip" data-skill="grill-with-docs"
+                    >/grill-with-docs</span
+                  >
+                  <span class="solution-chip" data-skill="grill-me"
+                    >/grill-me</span
+                  >
+                  <span class="solution-chip" data-skill="to-questionnaire"
+                    >/to-questionnaire</span
+                  >
+                </div>
+              </div>
+            </article>
+
+            <!-- Mode 2 -->
+            <article class="clean-card issue-card">
+              <div class="issue-card-head">
+                <h3 class="issue-card-title">#2 Agent 太啰嗦了</h3>
+                <span class="badge badge-amber">领域建模</span>
+              </div>
+              <blockquote class="master-quote">
+                "有了通用语言，开发者之间的对话与代码的表达全都源自同一个领域模型。"
+                <cite>— Eric Evans · 领域驱动设计</cite>
+              </blockquote>
+              <p class="issue-body-text">
+                <strong>问题根源：</strong>Agent
+                通常被随手丢进一个项目，然后被要求边走边弄清楚那些行话。于是它们用
+                20 个词才能说清 1 个词就能讲明白的事。修复方法是沉淀一份帮助
+                Agent 解码项目行话的
+                <code>CONTEXT.md</code> 文档，建立统一领域模型。
+              </p>
+              <div class="solution-box">
+                <div class="solution-box-title">
+                  <svg
+                    width="14"
+                    height="14"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--accent-amber)"
+                    stroke-width="2.5"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>修复方案</span>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-secondary)">
+                  统一命名、快速导航代码库、大幅降低思考 Token 消耗。
+                </p>
+                <div class="solution-skills-row">
+                  <span class="solution-chip" data-skill="domain-modeling"
+                    >domain-modeling</span
+                  >
+                  <span class="solution-chip" data-skill="grill-with-docs"
+                    >/grill-with-docs</span
+                  >
+                  <span class="solution-chip" data-skill="wait-what"
+                    >/wait-what</span
+                  >
+                </div>
+              </div>
+            </article>
+
+            <!-- Mode 3 -->
+            <article class="clean-card issue-card">
+              <div class="issue-card-head">
+                <h3 class="issue-card-title">#3 代码跑不通</h3>
+                <span class="badge badge-emerald">质量闭环</span>
+              </div>
+              <blockquote class="master-quote">
+                "永远采取小而刻意的步骤。反馈的速率就是你的速度上限。绝不要接手过于庞大的任务。"
+                <cite>— David Thomas & Andrew Hunt · 程序员修炼之道</cite>
+              </blockquote>
+              <p class="issue-body-text">
+                <strong>问题根源：</strong>假设你和 Agent
+                在要构建什么上达成了共识，当 Agent
+                仍然写出一堆垃圾时会发生什么？没有关于它产出的代码实际运行情况的反馈，Agent
+                就是在盲飞。你需要常规的反馈回路组合：静态类型、浏览器访问以及自动化测试。
+              </p>
+              <div class="solution-box">
+                <div class="solution-box-title">
+                  <svg
+                    width="14"
+                    height="14"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--accent-emerald)"
+                    stroke-width="2.5"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>修复方案</span>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-secondary)">
+                  先写失败测试再写实现，配合阶段把关调试循环。
+                </p>
+                <div class="solution-skills-row">
+                  <span class="solution-chip" data-skill="tdd">/tdd</span>
+                  <span class="solution-chip" data-skill="diagnosing-bugs"
+                    >/diagnosing-bugs</span
+                  >
+                  <span class="solution-chip" data-skill="code-review"
+                    >/code-review</span
+                  >
+                </div>
+              </div>
+            </article>
+
+            <!-- Mode 4 -->
+            <article class="clean-card issue-card">
+              <div class="issue-card-head">
+                <h3 class="issue-card-title">#4 造了一坨烂泥</h3>
+                <span class="badge badge-purple">架构深模块</span>
+              </div>
+              <blockquote class="master-quote">
+                "最好的模块是深的。它们通过一个简单的接口，就能访问大量功能。"
+                <cite>— John Ousterhout · 软件设计的哲学</cite>
+              </blockquote>
+              <p class="issue-body-text">
+                <strong>问题根源：</strong>大多数用 Agent
+                构建的应用都复杂且难以改动。因为 Agent
+                能极大加速编码，它们也同时加速了软件的熵增。代码库以空前的速率变得越来越复杂。修复方法是对
+                AI 驱动开发采取一种激进的新思路：关心代码的设计。
+              </p>
+              <div class="solution-box">
+                <div class="solution-box-title">
+                  <svg
+                    width="14"
+                    height="14"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="var(--accent-violet)"
+                    stroke-width="2.5"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span>修复方案</span>
+                </div>
+                <p style="font-size: 0.85rem; color: var(--text-secondary)">
+                  定期扫描代码库寻找「加深」机会，输出可视化 HTML 报告。
+                </p>
+                <div class="solution-skills-row">
+                  <span
+                    class="solution-chip"
+                    data-skill="improve-codebase-architecture"
+                    >/improve-codebase-architecture</span
+                  >
+                  <span class="solution-chip" data-skill="codebase-design"
+                    >codebase-design</span
+                  >
+                  <span class="solution-chip" data-skill="to-spec"
+                    >/to-spec</span
+                  >
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- Diff showcase -->
+          <div class="diff-showcase reveal" style="--reveal-delay: 0.2s">
+            <div class="diff-showcase-head">
+              <div>
+                <span
+                  id="diff-scenario-title"
+                  style="
+                    font-family: var(--font-mono);
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                    color: var(--text-heading);
+                  "
+                >
+                  // course-video-manager 的 CONTEXT.md 落地效果
+                </span>
+                <div class="diff-scenario-tabs">
+                  <button class="diff-tab-btn active" data-scenario="video">
+                    课程视频管理
+                  </button>
+                  <button class="diff-tab-btn" data-scenario="triage">
+                    工单分派
+                  </button>
+                  <button class="diff-tab-btn" data-scenario="deepening">
+                    计费深模块
+                  </button>
+                </div>
+              </div>
+              <span id="diff-savings-badge" class="badge badge-emerald"
+                >Token 节省 80%</span
+              >
             </div>
-            <blockquote class="master-quote">
-              "有了通用语言，开发者之间的对话与代码的表达全都源自同一个领域模型。"
-              <cite>— Eric Evans · 领域驱动设计</cite>
-            </blockquote>
-            <p class="issue-body-text">
-              <strong>问题根源：</strong>Agent 通常被随手丢进一个项目，然后被要求边走边弄清楚那些行话。于是它们用 20 个词才能说清 1 个词就能讲明白的事。修复方法是沉淀一份帮助 Agent 解码项目行话的 <code>CONTEXT.md</code> 文档，建立统一领域模型。
+
+            <div class="diff-split-grid">
+              <div class="diff-side diff-side-before">
+                <span class="diff-tag-label diff-tag-bad">
+                  <svg
+                    width="14"
+                    height="14"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="15" y1="9" x2="9" y2="15" />
+                    <line x1="9" y1="9" x2="15" y2="15" />
+                  </svg>
+                  BEFORE
+                </span>
+                <div
+                  id="diff-before-text"
+                  class="diff-quote-box diff-quote-bad"
+                >
+                  "当课程里某个章节中的一课被'实体化'（即被赋予了文件系统中的某个位置）时，会出问题。"
+                </div>
+                <p id="diff-before-note" class="diff-note-bad">
+                  ⚠️ Agent 需阅读长篇解释，长会话中极易概念漂移。
+                </p>
+              </div>
+              <div class="diff-side diff-side-after">
+                <span class="diff-tag-label diff-tag-good">
+                  <svg
+                    width="14"
+                    height="14"
+                    aria-hidden="true"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  AFTER
+                </span>
+                <div
+                  id="diff-after-text"
+                  class="diff-quote-box diff-quote-good"
+                >
+                  "实体化级联（materialization cascade）出问题了。"
+                </div>
+                <p id="diff-after-note" class="diff-note-good">
+                  ✅ 命名一致，Agent 导航更精准，思考消耗更少 Token。
+                </p>
+              </div>
+            </div>
+
+            <div class="token-gauge-wrap">
+              <div class="gauge-label-row">
+                <span class="gauge-label-text">压缩率</span>
+                <div
+                  class="gauge-bar-track"
+                  role="img"
+                  aria-label="压缩率进度条"
+                >
+                  <div
+                    id="diff-gauge-fill"
+                    class="gauge-bar-fill"
+                    style="width: 80%"
+                  ></div>
+                </div>
+              </div>
+              <span id="diff-gauge-text" class="gauge-text"
+                >Token 消耗减少 80%</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ TERMINAL ═══ -->
+      <section id="terminal-section" class="section">
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="section-tagline">live terminal</span>
+            <h2 class="section-title">交互式终端演练</h2>
+            <p class="section-subtitle">
+              点击 Tab 查看常用工程技能在 Claude Code / Codex
+              真实执行流中的纪律约束与输出。
             </p>
-            <div class="solution-box">
-              <div class="solution-box-title">
-                <svg width="14" height="14" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="var(--accent-amber)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>修复方案</span>
-              </div>
-              <p style="font-size: 0.85rem; color: var(--text-secondary);">统一命名、快速导航代码库、大幅降低思考 Token 消耗。</p>
-              <div class="solution-skills-row">
-                <span class="solution-chip" data-skill="domain-modeling">domain-modeling</span>
-                <span class="solution-chip" data-skill="grill-with-docs">/grill-with-docs</span>
-                <span class="solution-chip" data-skill="wait-what">/wait-what</span>
-              </div>
-            </div>
-          </article>
+          </div>
 
-          <!-- Mode 3 -->
-          <article class="clean-card issue-card">
-            <div class="issue-card-head">
-              <h3 class="issue-card-title">#3 代码跑不通</h3>
-              <span class="badge badge-emerald">质量闭环</span>
+          <div class="terminal-wrapper reveal" style="--reveal-delay: 0.1s">
+            <div class="terminal-header-bar">
+              <div class="terminal-header-left">
+                <div class="terminal-window-controls" role="presentation">
+                  <span class="win-dot win-dot-red"></span>
+                  <span class="win-dot win-dot-yellow"></span>
+                  <span class="win-dot win-dot-green"></span>
+                </div>
+                <div class="terminal-tabs" role="tablist" aria-label="终端预设">
+                  <button
+                    class="term-tab-btn active"
+                    data-preset="grill-with-docs"
+                    role="tab"
+                    aria-selected="true"
+                  >
+                    /grill-with-docs
+                  </button>
+                  <button
+                    class="term-tab-btn"
+                    data-preset="tdd"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    /tdd
+                  </button>
+                  <button
+                    class="term-tab-btn"
+                    data-preset="architecture"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    /improve-codebase-architecture
+                  </button>
+                  <button
+                    class="term-tab-btn"
+                    data-preset="diagnosing"
+                    role="tab"
+                    aria-selected="false"
+                  >
+                    /diagnosing-bugs
+                  </button>
+                </div>
+              </div>
+              <div class="terminal-header-actions">
+                <button
+                  id="term-copy-logs-btn"
+                  class="term-action-btn"
+                  type="button"
+                >
+                  📋 复制
+                </button>
+                <button
+                  id="term-replay-btn"
+                  class="term-action-btn"
+                  type="button"
+                >
+                  ↻ 重播
+                </button>
+              </div>
             </div>
-            <blockquote class="master-quote">
-              "永远采取小而刻意的步骤。反馈的速率就是你的速度上限。绝不要接手过于庞大的任务。"
-              <cite>— David Thomas & Andrew Hunt · 程序员修炼之道</cite>
-            </blockquote>
-            <p class="issue-body-text">
-              <strong>问题根源：</strong>假设你和 Agent 在要构建什么上达成了共识，当 Agent 仍然写出一堆垃圾时会发生什么？没有关于它产出的代码实际运行情况的反馈，Agent 就是在盲飞。你需要常规的反馈回路组合：静态类型、浏览器访问以及自动化测试。
+            <div
+              id="terminal-screen"
+              class="terminal-screen-view"
+              role="log"
+              aria-live="polite"
+              aria-label="终端输出"
+            ></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ SKILLS MATRIX ═══ -->
+      <section id="skills-matrix" class="section">
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="section-tagline">skills directory</span>
+            <h2 class="section-title">技能全景检索矩阵</h2>
+            <p class="section-subtitle">
+              按调用维度严谨划分：<strong>用户调用</strong>负责全局编排，<strong>模型调用</strong>承载工程纪律。
             </p>
-            <div class="solution-box">
-              <div class="solution-box-title">
-                <svg width="14" height="14" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="var(--accent-emerald)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>修复方案</span>
-              </div>
-              <p style="font-size: 0.85rem; color: var(--text-secondary);">先写失败测试再写实现，配合阶段把关调试循环。</p>
-              <div class="solution-skills-row">
-                <span class="solution-chip" data-skill="tdd">/tdd</span>
-                <span class="solution-chip" data-skill="diagnosing-bugs">/diagnosing-bugs</span>
-                <span class="solution-chip" data-skill="code-review">/code-review</span>
-              </div>
-            </div>
-          </article>
+          </div>
 
-          <!-- Mode 4 -->
-          <article class="clean-card issue-card">
-            <div class="issue-card-head">
-              <h3 class="issue-card-title">#4 造了一坨烂泥</h3>
-              <span class="badge badge-purple">架构深模块</span>
+          <div class="skills-controls-row reveal" style="--reveal-delay: 0.1s">
+            <div class="filter-segments">
+              <button class="filter-btn active" data-filter="all">ALL</button>
+              <button class="filter-btn" data-filter="engineering">工程</button>
+              <button class="filter-btn" data-filter="productivity">
+                效率
+              </button>
+              <button class="filter-btn" data-filter="user">用户调用</button>
+              <button class="filter-btn" data-filter="model">模型调用</button>
             </div>
-            <blockquote class="master-quote">
-              "最好的模块是深的。它们通过一个简单的接口，就能访问大量功能。"
-              <cite>— John Ousterhout · 软件设计的哲学</cite>
-            </blockquote>
-            <p class="issue-body-text">
-              <strong>问题根源：</strong>大多数用 Agent 构建的应用都复杂且难以改动。因为 Agent 能极大加速编码，它们也同时加速了软件的熵增。代码库以空前的速率变得越来越复杂。修复方法是对 AI 驱动开发采取一种激进的新思路：关心代码的设计。
+            <div class="search-box-wrap">
+              <input
+                type="text"
+                id="skills-search"
+                class="search-input-field"
+                placeholder="搜索技能..."
+                aria-label="搜索技能"
+              />
+              <span class="search-key-badge kbd">/</span>
+            </div>
+          </div>
+
+          <div class="skills-meta-bar reveal" style="--reveal-delay: 0.16s">
+            <div
+              id="skills-count"
+              style="
+                font-family: var(--font-mono);
+                font-size: 0.8rem;
+                color: var(--text-muted);
+              "
+            >
+              加载中...
+            </div>
+            <div class="view-switcher-group">
+              <button
+                class="view-switch-btn active"
+                data-view="grid"
+                title="卡片视图"
+              >
+                <svg
+                  width="13"
+                  height="13"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect width="7" height="7" x="3" y="3" rx="1" />
+                  <rect width="7" height="7" x="14" y="3" rx="1" />
+                  <rect width="7" height="7" x="14" y="14" rx="1" />
+                  <rect width="7" height="7" x="3" y="14" rx="1" />
+                </svg>
+                卡片
+              </button>
+              <button
+                class="view-switch-btn"
+                data-view="table"
+                title="表格视图"
+              >
+                <svg
+                  width="13"
+                  height="13"
+                  aria-hidden="true"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+                表格
+              </button>
+            </div>
+          </div>
+
+          <div id="skills-grid" class="skills-grid-container"></div>
+          <div
+            id="skills-table-wrap"
+            class="skills-table-container"
+            style="display: none"
+          ></div>
+        </div>
+      </section>
+
+      <!-- ═══ INSTALLATION ═══ -->
+      <section id="installation" class="section">
+        <div class="container">
+          <div class="section-head reveal">
+            <span class="section-tagline">quick setup</span>
+            <h2 class="section-title">安装 · 30 秒搞定</h2>
+            <p class="section-subtitle">
+              两种进入方式：<strong>Claude Code 插件</strong
+              >作为受管理的只读包自动更新；<strong>skills.sh</strong>把可编辑源码写入项目据为己有。
             </p>
-            <div class="solution-box">
-              <div class="solution-box-title">
-                <svg width="14" height="14" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="var(--accent-violet)" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                <span>修复方案</span>
+          </div>
+
+          <div class="install-card-wrap reveal" style="--reveal-delay: 0.1s">
+            <div class="install-tab-header">
+              <button class="install-tab-btn active" data-target="panel-claude">
+                Claude Code 插件
+              </button>
+              <button class="install-tab-btn" data-target="panel-codex">
+                Codex / skills.sh
+              </button>
+              <button class="install-tab-btn" data-target="panel-hacker">
+                给折腾党
+              </button>
+            </div>
+
+            <div class="install-tab-body">
+              <div id="panel-claude" class="install-panel-view">
+                <p class="install-panel-text">
+                  位于 Claude Code
+                  官方市场，作为一个受管理的只读包安装。我会发布更新它就更新——你是在订阅，而不是复刻：
+                </p>
+                <div class="install-command-bar">
+                  <code id="code-claude"
+                    >claude plugins install mattpocock-skills</code
+                  >
+                  <button
+                    class="btn btn-secondary install-copy-btn copy-trigger"
+                    data-target="#code-claude"
+                    type="button"
+                  >
+                    复制
+                  </button>
+                </div>
+                <p class="install-panel-hint">
+                  或者在会话内执行：<code
+                    >/plugin install mattpocock-skills</code
+                  >
+                </p>
               </div>
-              <p style="font-size: 0.85rem; color: var(--text-secondary);">定期扫描代码库寻找「加深」机会，输出可视化 HTML 报告。</p>
-              <div class="solution-skills-row">
-                <span class="solution-chip" data-skill="improve-codebase-architecture">/improve-codebase-architecture</span>
-                <span class="solution-chip" data-skill="codebase-design">codebase-design</span>
-                <span class="solution-chip" data-skill="to-spec">/to-spec</span>
+
+              <div
+                id="panel-codex"
+                class="install-panel-view"
+                style="display: none"
+              >
+                <p class="install-panel-text">
+                  使用 skills.sh
+                  安装器，选择你想要的技能，以及要把它们安装到哪些编码 Agent
+                  上：
+                </p>
+                <div class="install-command-bar">
+                  <code id="code-codex"
+                    >npx skills@latest add mattpocock/skills</code
+                  >
+                  <button
+                    class="btn btn-secondary install-copy-btn copy-trigger"
+                    data-target="#code-codex"
+                    type="button"
+                  >
+                    复制
+                  </button>
+                </div>
+                <p class="install-panel-hint install-panel-tip">
+                  💡 务必把 <code>setup-matt-pocock-skills</code> 包含在内。
+                </p>
+              </div>
+
+              <div
+                id="panel-hacker"
+                class="install-panel-view"
+                style="display: none"
+              >
+                <p class="install-panel-text">
+                  用同一个安装器，它会把这些技能作为你拥有且可编辑的普通文件写入你的仓库：
+                </p>
+                <div class="install-command-bar">
+                  <code id="code-hacker"
+                    >npx skills@latest add mattpocock/skills</code
+                  >
+                  <button
+                    class="btn btn-secondary install-copy-btn copy-trigger"
+                    data-target="#code-hacker"
+                    type="button"
+                  >
+                    复制
+                  </button>
+                </div>
+                <div class="install-command-bar install-command-bar-gap">
+                  <code id="code-update">npx skills update</code>
+                  <button
+                    class="btn btn-secondary install-copy-btn copy-trigger"
+                    data-target="#code-update"
+                    type="button"
+                  >
+                    复制
+                  </button>
+                </div>
+              </div>
+
+              <div class="setup-steps-grid">
+                <div
+                  class="setup-step-box"
+                  data-step="STEP 01"
+                  tabindex="0"
+                  role="button"
+                  aria-pressed="false"
+                >
+                  <span class="setup-step-number">STEP 01</span>
+                  <h4 class="setup-step-title">获取技能</h4>
+                  <p class="setup-step-desc">
+                    通过 Claude 插件市场或 npx 导入，二选一即可。
+                  </p>
+                </div>
+                <div
+                  class="setup-step-box"
+                  data-step="STEP 02"
+                  tabindex="0"
+                  role="button"
+                  aria-pressed="false"
+                  style="
+                    border-color: var(--accent-cyan-border);
+                    background: var(--accent-cyan-subtle);
+                  "
+                >
+                  <span class="setup-step-number">STEP 02</span>
+                  <h4 class="setup-step-title">运行初始化</h4>
+                  <p class="setup-step-desc">
+                    在仓库执行
+                    <code>/setup-matt-pocock-skills</code> 配置追踪器。
+                  </p>
+                </div>
+                <div
+                  class="setup-step-box"
+                  data-step="STEP 03"
+                  tabindex="0"
+                  role="button"
+                  aria-pressed="false"
+                >
+                  <span class="setup-step-number">STEP 03</span>
+                  <h4 class="setup-step-title">准备开干</h4>
+                  <p class="setup-step-desc">
+                    输入 <code>/grill-with-docs</code> 或
+                    <code>/tdd</code> 启动工程流。
+                  </p>
+                </div>
               </div>
             </div>
-          </article>
+          </div>
         </div>
+      </section>
 
-        <!-- Diff showcase -->
-        <div class="diff-showcase reveal" style="--reveal-delay: 0.2s;">
-          <div class="diff-showcase-head">
-            <div>
-              <span id="diff-scenario-title" style="font-family: var(--font-mono); font-size: 0.85rem; font-weight: 600; color: var(--text-heading);">
-                // course-video-manager 的 CONTEXT.md 落地效果
-              </span>
-              <div class="diff-scenario-tabs">
-                <button class="diff-tab-btn active" data-scenario="video">课程视频管理</button>
-                <button class="diff-tab-btn" data-scenario="triage">工单分派</button>
-                <button class="diff-tab-btn" data-scenario="deepening">计费深模块</button>
-              </div>
+      <!-- ═══ NEWSLETTER ═══ -->
+      <section id="newsletter" class="section">
+        <div class="container">
+          <div
+            class="clean-card newsletter-card reveal"
+            style="--reveal-delay: 0.1s"
+          >
+            <div class="newsletter-text-block">
+              <h3 class="newsletter-title">加入 60,000 名开发者的工程进化</h3>
+              <p class="newsletter-subtitle">
+                跟进这些技能的改动，以及 Matt Pocock 创建的任何新技能。
+              </p>
             </div>
-            <span id="diff-savings-badge" class="badge badge-emerald">Token 节省 80%</span>
-          </div>
-
-          <div class="diff-split-grid">
-            <div class="diff-side diff-side-before">
-              <span class="diff-tag-label diff-tag-bad">
-                <svg width="14" height="14" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                BEFORE
-              </span>
-              <div id="diff-before-text" class="diff-quote-box diff-quote-bad">"当课程里某个章节中的一课被'实体化'（即被赋予了文件系统中的某个位置）时，会出问题。"</div>
-              <p id="diff-before-note" class="diff-note-bad">⚠️ Agent 需阅读长篇解释，长会话中极易概念漂移。</p>
+            <div class="newsletter-actions">
+              <a
+                href="https://www.aihero.dev/s/skills-newsletter"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-primary newsletter-cta-btn"
+                >订阅 ↗</a
+              >
+              <a
+                href="https://skills.sh/mattpocock/skills"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn btn-secondary newsletter-secondary-btn"
+                >skills.sh ↗</a
+              >
             </div>
-            <div class="diff-side diff-side-after">
-              <span class="diff-tag-label diff-tag-good">
-                <svg width="14" height="14" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                AFTER
-              </span>
-              <div id="diff-after-text" class="diff-quote-box diff-quote-good">"实体化级联（materialization cascade）出问题了。"</div>
-              <p id="diff-after-note" class="diff-note-good">✅ 命名一致，Agent 导航更精准，思考消耗更少 Token。</p>
-            </div>
-          </div>
-
-          <div class="token-gauge-wrap">
-            <div class="gauge-label-row">
-              <span class="gauge-label-text">压缩率</span>
-              <div class="gauge-bar-track" role="img" aria-label="压缩率进度条">
-                <div id="diff-gauge-fill" class="gauge-bar-fill" style="width: 80%;"></div>
-              </div>
-            </div>
-            <span id="diff-gauge-text" class="gauge-text">Token 消耗减少 80%</span>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </main>
 
-    <!-- ═══ TERMINAL ═══ -->
-    <section id="terminal-section" class="section">
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="site-footer">
       <div class="container">
-        <div class="section-head reveal">
-          <span class="section-tagline">live terminal</span>
-          <h2 class="section-title">交互式终端演练</h2>
-          <p class="section-subtitle">
-            点击 Tab 查看常用工程技能在 Claude Code / Codex 真实执行流中的纪律约束与输出。
-          </p>
-        </div>
-
-        <div class="terminal-wrapper reveal" style="--reveal-delay: 0.1s;">
-          <div class="terminal-header-bar">
-            <div class="terminal-header-left">
-              <div class="terminal-window-controls" role="presentation">
-                <span class="win-dot win-dot-red"></span>
-                <span class="win-dot win-dot-yellow"></span>
-                <span class="win-dot win-dot-green"></span>
-              </div>
-              <div class="terminal-tabs" role="tablist" aria-label="终端预设">
-                <button class="term-tab-btn active" data-preset="grill-with-docs" role="tab" aria-selected="true">/grill-with-docs</button>
-                <button class="term-tab-btn" data-preset="tdd" role="tab" aria-selected="false">/tdd</button>
-                <button class="term-tab-btn" data-preset="architecture" role="tab" aria-selected="false">/improve-codebase-architecture</button>
-                <button class="term-tab-btn" data-preset="diagnosing" role="tab" aria-selected="false">/diagnosing-bugs</button>
-              </div>
+        <div class="footer-top-row">
+          <div class="footer-brand-wrap">
+            <div class="brand-emblem" style="width: 24px; height: 24px">
+              <svg
+                width="13"
+                height="13"
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+              </svg>
             </div>
-            <div class="terminal-header-actions">
-              <button id="term-copy-logs-btn" class="term-action-btn" type="button">📋 复制</button>
-              <button id="term-replay-btn" class="term-action-btn" type="button">↻ 重播</button>
-            </div>
+            <strong class="footer-brand-name">matt_pocock/skills</strong>
+            <span class="footer-brand-suffix">// 开源工程实践</span>
           </div>
-          <div id="terminal-screen" class="terminal-screen-view" role="log" aria-live="polite" aria-label="终端输出"></div>
+          <nav class="footer-links" aria-label="页脚导航">
+            <a
+              href="https://github.com/mattpocock/skills"
+              target="_blank"
+              rel="noopener noreferrer"
+              >GitHub ↗</a
+            >
+            <a
+              href="https://skills.sh/mattpocock/skills"
+              target="_blank"
+              rel="noopener noreferrer"
+              >skills.sh ↗</a
+            >
+            <a
+              href="https://www.aihero.dev/s/skills-newsletter"
+              target="_blank"
+              rel="noopener noreferrer"
+              >订阅 ↗</a
+            >
+          </nav>
+        </div>
+        <div class="footer-bottom-row">
+          <span class="footer-version">v1.0.0 · MIT License</span>
+          <span>做正经工程，拒绝氛围编程。</span>
         </div>
       </div>
-    </section>
+    </footer>
 
-    <!-- ═══ SKILLS MATRIX ═══ -->
-    <section id="skills-matrix" class="section">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="section-tagline">skills directory</span>
-          <h2 class="section-title">技能全景检索矩阵</h2>
-          <p class="section-subtitle">
-            按调用维度严谨划分：<strong>用户调用</strong>负责全局编排，<strong>模型调用</strong>承载工程纪律。
-          </p>
-        </div>
-
-        <div class="skills-controls-row reveal" style="--reveal-delay: 0.1s;">
-          <div class="filter-segments">
-            <button class="filter-btn active" data-filter="all">ALL</button>
-            <button class="filter-btn" data-filter="engineering">工程</button>
-            <button class="filter-btn" data-filter="productivity">效率</button>
-            <button class="filter-btn" data-filter="user">用户调用</button>
-            <button class="filter-btn" data-filter="model">模型调用</button>
-          </div>
-          <div class="search-box-wrap">
-            <input type="text" id="skills-search" class="search-input-field" placeholder="搜索技能..." aria-label="搜索技能">
-            <span class="search-key-badge kbd">/</span>
-          </div>
-        </div>
-
-        <div class="skills-meta-bar reveal" style="--reveal-delay: 0.16s;">
-          <div id="skills-count" style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">加载中...</div>
-          <div class="view-switcher-group">
-            <button class="view-switch-btn active" data-view="grid" title="卡片视图">
-              <svg width="13" height="13" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>
-              卡片
-            </button>
-            <button class="view-switch-btn" data-view="table" title="表格视图">
-              <svg width="13" height="13" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-              表格
-            </button>
-          </div>
-        </div>
-
-        <div id="skills-grid" class="skills-grid-container"></div>
-        <div id="skills-table-wrap" class="skills-table-container" style="display: none;"></div>
-      </div>
-    </section>
-
-    <!-- ═══ INSTALLATION ═══ -->
-    <section id="installation" class="section">
-      <div class="container">
-        <div class="section-head reveal">
-          <span class="section-tagline">quick setup</span>
-          <h2 class="section-title">安装 · 30 秒搞定</h2>
-          <p class="section-subtitle">
-            两种进入方式：<strong>Claude Code 插件</strong>作为受管理的只读包自动更新；<strong>skills.sh</strong>把可编辑源码写入项目据为己有。
-          </p>
-        </div>
-
-        <div class="install-card-wrap reveal" style="--reveal-delay: 0.1s;">
-          <div class="install-tab-header">
-            <button class="install-tab-btn active" data-target="panel-claude">Claude Code 插件</button>
-            <button class="install-tab-btn" data-target="panel-codex">Codex / skills.sh</button>
-            <button class="install-tab-btn" data-target="panel-hacker">给折腾党</button>
-          </div>
-
-          <div class="install-tab-body">
-            <div id="panel-claude" class="install-panel-view">
-              <p class="install-panel-text">位于 Claude Code 官方市场，作为一个受管理的只读包安装。我会发布更新它就更新——你是在订阅，而不是复刻：</p>
-              <div class="install-command-bar">
-                <code id="code-claude">claude plugins install mattpocock-skills</code>
-                <button class="btn btn-secondary install-copy-btn copy-trigger" data-target="#code-claude" type="button">复制</button>
-              </div>
-              <p class="install-panel-hint">或者在会话内执行：<code>/plugin install mattpocock-skills</code></p>
-            </div>
-
-            <div id="panel-codex" class="install-panel-view" style="display: none;">
-              <p class="install-panel-text">使用 skills.sh 安装器，选择你想要的技能，以及要把它们安装到哪些编码 Agent 上：</p>
-              <div class="install-command-bar">
-                <code id="code-codex">npx skills@latest add mattpocock/skills</code>
-                <button class="btn btn-secondary install-copy-btn copy-trigger" data-target="#code-codex" type="button">复制</button>
-              </div>
-              <p class="install-panel-hint install-panel-tip">💡 务必把 <code>setup-matt-pocock-skills</code> 包含在内。</p>
-            </div>
-
-            <div id="panel-hacker" class="install-panel-view" style="display: none;">
-              <p class="install-panel-text">用同一个安装器，它会把这些技能作为你拥有且可编辑的普通文件写入你的仓库：</p>
-              <div class="install-command-bar">
-                <code id="code-hacker">npx skills@latest add mattpocock/skills</code>
-                <button class="btn btn-secondary install-copy-btn copy-trigger" data-target="#code-hacker" type="button">复制</button>
-              </div>
-              <div class="install-command-bar install-command-bar-gap">
-                <code id="code-update">npx skills update</code>
-                <button class="btn btn-secondary install-copy-btn copy-trigger" data-target="#code-update" type="button">复制</button>
-              </div>
-            </div>
-
-            <div class="setup-steps-grid">
-              <div class="setup-step-box" data-step="STEP 01" tabindex="0" role="button" aria-pressed="false">
-                <span class="setup-step-number">STEP 01</span>
-                <h4 class="setup-step-title">获取技能</h4>
-                <p class="setup-step-desc">通过 Claude 插件市场或 npx 导入，二选一即可。</p>
-              </div>
-              <div class="setup-step-box" data-step="STEP 02" tabindex="0" role="button" aria-pressed="false" style="border-color: var(--accent-cyan-border); background: var(--accent-cyan-subtle);">
-                <span class="setup-step-number">STEP 02</span>
-                <h4 class="setup-step-title">运行初始化</h4>
-                <p class="setup-step-desc">在仓库执行 <code>/setup-matt-pocock-skills</code> 配置追踪器。</p>
-              </div>
-              <div class="setup-step-box" data-step="STEP 03" tabindex="0" role="button" aria-pressed="false">
-                <span class="setup-step-number">STEP 03</span>
-                <h4 class="setup-step-title">准备开干</h4>
-                <p class="setup-step-desc">输入 <code>/grill-with-docs</code> 或 <code>/tdd</code> 启动工程流。</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ═══ NEWSLETTER ═══ -->
-    <section id="newsletter" class="section">
-      <div class="container">
-        <div class="clean-card newsletter-card reveal" style="--reveal-delay: 0.1s;">
-          <div class="newsletter-text-block">
-            <h3 class="newsletter-title">加入 60,000 名开发者的工程进化</h3>
-            <p class="newsletter-subtitle">跟进这些技能的改动，以及 Matt Pocock 创建的任何新技能。</p>
-          </div>
-          <div class="newsletter-actions">
-            <a href="https://www.aihero.dev/s/skills-newsletter" target="_blank" rel="noopener noreferrer" class="btn btn-primary newsletter-cta-btn">订阅 ↗</a>
-            <a href="https://skills.sh/mattpocock/skills" target="_blank" rel="noopener noreferrer" class="btn btn-secondary newsletter-secondary-btn">skills.sh ↗</a>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- ═══ FOOTER ═══ -->
-  <footer class="site-footer">
-    <div class="container">
-      <div class="footer-top-row">
-        <div class="footer-brand-wrap">
-          <div class="brand-emblem" style="width: 24px; height: 24px;">
-            <svg width="13" height="13" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-          </div>
-          <strong class="footer-brand-name">matt_pocock/skills</strong>
-          <span class="footer-brand-suffix">// 开源工程实践</span>
-        </div>
-        <nav class="footer-links" aria-label="页脚导航">
-          <a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a>
-          <a href="https://skills.sh/mattpocock/skills" target="_blank" rel="noopener noreferrer">skills.sh ↗</a>
-          <a href="https://www.aihero.dev/s/skills-newsletter" target="_blank" rel="noopener noreferrer">订阅 ↗</a>
-        </nav>
-      </div>
-      <div class="footer-bottom-row">
-        <span class="footer-version">v1.0.0 · MIT License</span>
-        <span>做正经工程，拒绝氛围编程。</span>
-      </div>
+    <!-- Modal overlay -->
+    <div
+      id="skill-modal"
+      class="modal-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" id="modal-dialog-inner"></div>
     </div>
-  </footer>
 
-  <!-- Modal overlay -->
-  <div id="skill-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
-    <div class="modal-dialog" id="modal-dialog-inner"></div>
-  </div>
+    <!-- Toast container -->
+    <div
+      id="toast-container"
+      class="toast-container"
+      role="status"
+      aria-live="polite"
+      aria-atomic="true"
+    ></div>
 
-  <!-- Toast container -->
-  <div id="toast-container" class="toast-container" role="status" aria-live="polite" aria-atomic="true"></div>
-
-  <script>document.documentElement.classList.add('js');</script>
-  <script src="js/data.js"></script>
-  <script src="js/app.js"></script>
-  <script src="js/terminal.js"></script>
-</body>
+    <script>
+      document.documentElement.classList.add("js");
+    </script>
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/terminal.js"></script>
+  </body>
 </html>
